@@ -50,7 +50,7 @@ export default function LineupBuilder(){
           </select>
         </label>)}
       </div>
-      <button className="submitLineup" disabled={busy}>{busy?'Validating…':'Validate Lineup'}</button>
+      <button className="submitLineup" disabled={busy}>{busy?'Submitting…':'Submit Lineup'}</button>
       {msg && <div className="lineupMessage">{msg}</div>}
     </form>
   </main>

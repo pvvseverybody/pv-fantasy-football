@@ -12,7 +12,7 @@ function privateKey() {
   return required('GOOGLE_PRIVATE_KEY').replace(/\\n/g, '\n');
 }
 
-export async function readSheetRange(range) {
+async function sheetsRequest(path, options = {}) {
   const auth = new GoogleAuth({
     credentials: {
       client_email: required('GOOGLE_SERVICE_ACCOUNT_EMAIL'),
@@ -25,20 +25,56 @@ export async function readSheetRange(range) {
   const token = await client.getAccessToken();
   const spreadsheetId = required('BACKEND_SPREADSHEET_ID');
 
-  const url =
-    `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}` +
-    `/values/${encodeURIComponent(range)}?majorDimension=ROWS`;
+  const separator = path.startsWith('?') ? '' : '/';
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}${separator}${path}`;
 
   const response = await fetch(url, {
-    headers: {Authorization: `Bearer ${token.token}`},
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token.token}`,
+    },
     cache: 'no-store',
   });
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`Google Sheets read failed (${response.status}): ${detail.slice(0, 300)}`);
+    throw new Error(`Google Sheets request failed (${response.status}): ${detail.slice(0, 300)}`);
   }
 
-  const data = await response.json();
+  return response.json();
+}
+
+export async function readSheetRange(range, {valueRenderOption = 'FORMATTED_VALUE'} = {}) {
+  const data = await sheetsRequest(
+    `values/${encodeURIComponent(range)}?majorDimension=ROWS&valueRenderOption=${valueRenderOption}`
+  );
   return data.values || [];
+}
+
+export async function getSpreadsheetMetadata() {
+  return sheetsRequest(
+    '?fields=sheets.properties(sheetId,title,gridProperties(rowCount,columnCount))'
+  );
+}
+
+export async function batchUpdateSpreadsheet(requests) {
+  return sheetsRequest('batchUpdate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({requests}),
+  });
+}
+
+export async function appendSheetRow(range, row) {
+  return sheetsRequest(
+    `values/${encodeURIComponent(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({majorDimension: 'ROWS', values: [row]}),
+    }
+  );
 }
