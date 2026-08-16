@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server'; export async function GET(){return NextResponse.json({lineup:null,status:'backend_pending'});} export async function POST(req){await req.json();return NextResponse.json({accepted:false,message:'Production backend connection is not active yet.'},{status:503});}

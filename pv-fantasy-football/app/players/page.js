@@ -1,0 +1,1 @@
+export default function Players(){return <main><section><h2>Player Stats</h2><p>Official player profiles, weekly fantasy points, season totals and game-by-game scoring will populate here from the production API.</p><a href="/">← Lineup</a></section></main>}

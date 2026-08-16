@@ -1,0 +1,1 @@
+export default function Board(){return <main><section><h2>Leaderboard</h2><p>The public Week 0 leaderboard will refresh every 15 seconds during live play.</p><a href="/">← Lineup</a></section></main>}
