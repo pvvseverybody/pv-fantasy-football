@@ -1,1 +1,17 @@
 :root{--purple:#4f2683;--gold:#f5b82e;--ink:#111}*{box-sizing:border-box}body{margin:0;background:#080808;color:#fff;font-family:Arial,sans-serif}main{max-width:760px;margin:auto;min-height:100vh;background:#111}header{text-align:center;padding:38px 20px 28px;background:linear-gradient(180deg,#000,#26133a);border-bottom:4px solid var(--gold)}.pv{font-size:42px;letter-spacing:12px;color:var(--gold)}h1{margin:8px 0;color:white;font-size:42px;line-height:.9}header p{color:var(--gold);font-weight:700}nav{display:flex;justify-content:space-around;padding:14px;background:var(--purple);position:sticky;top:0}nav a{color:#fff;text-decoration:none;font-weight:700}section{padding:24px}h2{color:var(--gold)}label{display:block;margin:18px 0}label span{display:block;font-weight:800;margin-bottom:7px}select{width:100%;padding:15px;border-radius:8px;border:1px solid #555;background:#1d1d1d;color:#fff;font-size:16px}button{width:100%;padding:16px;background:var(--gold);border:0;border-radius:8px;font-weight:900;font-size:18px}.notice{margin-top:16px;padding:14px;background:#222;border-left:4px solid var(--gold)}
+
+
+
+/* PV Fantasy Lineup Builder */
+.lineupPage{max-width:1100px;margin:0 auto;padding:48px 20px 80px}
+.lineupHero{margin-bottom:28px}.lineupHero h1{font-size:clamp(36px,6vw,64px);margin:6px 0 10px}.lineupHero p{opacity:.78}
+.eyebrow{font-weight:900;letter-spacing:.14em;font-size:12px;color:#f4c430}
+.lineupCard{background:#17131d;border:1px solid #3d3150;border-radius:22px;padding:24px;box-shadow:0 20px 60px #0005}
+.lineupIdentity,.slotGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.lineupIdentity{margin-bottom:22px}.slotGrid{margin-bottom:24px}
+.lineupCard label{display:flex;flex-direction:column;gap:8px;font-weight:800}
+.lineupCard input,.lineupCard select{width:100%;padding:13px 14px;border-radius:10px;border:1px solid #5b4a72;background:#0d0a11;color:#fff;font:inherit}
+.slot{padding:16px;border:1px solid #332a40;border-radius:14px;background:#120e18}.slot span{color:#f4c430}
+.submitLineup{width:100%;padding:15px;border:0;border-radius:12px;background:#f4c430;color:#231331;font-weight:1000;font-size:16px;cursor:pointer}
+.submitLineup:disabled{opacity:.6}.lineupMessage{margin-top:16px;padding:14px;border-radius:10px;background:#251c30}
+@media(max-width:720px){.lineupIdentity,.slotGrid{grid-template-columns:1fr}.lineupPage{padding-top:28px}}
