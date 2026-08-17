@@ -45,3 +45,11 @@ Negative-yard scoring follows the existing adapter contract: `TFL Yds + INT Retu
 Run `npm run certify:preseason` to execute the isolated end-to-end certification harness and regenerate `reports/preseason-certification.md`. The harness uses only in-memory fixture tables; it never calls Google Sheets or the production scoring endpoint.
 
 It covers two participants across two games, a shared player, a pre-kickoff lineup replacement, a rejected late submission, scoring and reconciliation, cumulative ordering, idempotent reruns, excluded return touchdowns, and fail-closed behavior for a missing normalized player row. A passing local report is a preseason logic certificate only; the workbook's PVFeedCertification L2/L3 and PublishControl gates remain required for a live Prairie View game.
+
+## L2 live-provider certification
+
+Run `npm run certify:l2-transport` to perform the read-only L2 preflight against the official Stony Brook at Delaware State SIDEARM feed and regenerate `reports/l2-transport-certification.md`. The harness validates endpoint allowlisting, HTTP/JSON transport, CORS, cache validators, event identity, football schema groups, and pregame state without writing to the workbook.
+
+Preflight readiness is not a full L2 pass. During the August 27 live window, L2 must still capture changing 15-second snapshots, corrections, final-state detection, official-stat reconciliation, and proof that polling stops after final.
+
+Run `npm run certify:sidearm-history` to inspect the allowlisted official historical SIDEARM JSONP events, validate the provider-to-GameStats adapter in memory, recheck the staged event identity/date, and regenerate `reports/sidearm-historical-adapter-certification.md`. Forced fumbles, defensive recoveries, and fumble-return touchdowns remain blocked when no proven aggregate provider field or official fallback is available.
