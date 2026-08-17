@@ -25,6 +25,25 @@ export const SIDEARM_FIELD_MAP = [
   ['PuntReturns.PuntReturnTouchdowns','audit.puntReturnTouchdowns','VERIFIED_EXCLUDED'],
 ];
 
+export const OFFICIAL_FINAL_STATBOOK_FIELD_MAP = [
+  ['Defensive Statistics.FF','forcedFumbles','VERIFIED_OFFICIAL_FINAL'],
+  ['Defensive Statistics.FR-Yds recovery count','fumbleRecoveries','VERIFIED_OFFICIAL_FINAL'],
+  ['Scoring Summary: named fumble recovery touchdown, reconciled to team Fumble Returns TD','defensiveReturnTouchdowns','VERIFIED_OFFICIAL_FINAL'],
+];
+
+export function applyOfficialDefensiveStatbookFallback(rows, entries) {
+  const result=rows.map(row=>({...row,audit:{...(row.audit||{})}}));const byId=new Map(result.map(row=>[row.playerId,row]));const issues=[];const seen=new Set();
+  for(const entry of entries||[]){
+    if(!entry?.officialFinal||!/^https:\/\//.test(String(entry.sourceArtifact||''))){issues.push({code:'UNVERIFIED_DEFENSIVE_FALLBACK',playerId:entry?.playerId||null});continue;}
+    if(seen.has(entry.playerId)){issues.push({code:'DUPLICATE_DEFENSIVE_FALLBACK',playerId:entry.playerId});continue;}seen.add(entry.playerId);
+    const row=byId.get(entry.playerId);if(!row){issues.push({code:'UNMATCHED_DEFENSIVE_FALLBACK',playerId:entry.playerId});continue;}
+    const fields=['forcedFumbles','fumbleRecoveries','defensiveReturnTouchdowns'];let valid=true;
+    for(const field of fields)if(!Number.isFinite(entry[field])||entry[field]<0){issues.push({code:'INVALID_DEFENSIVE_FALLBACK',playerId:entry.playerId,field});valid=false;}
+    if(!valid)continue;for(const field of fields)row[field]=entry[field];row.audit.officialDefensiveFallback=entry.sourceArtifact;
+  }
+  return {rows:result,issues};
+}
+
 export function normalizeName(value) {
   return String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g,'')
     .toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b/g,'').replace(/[^a-z0-9]/g,'');
@@ -50,7 +69,8 @@ export function resolveSidearmIdentity(groupRow, team, canonicalPlayers = []) {
   let method = 'PERSON_ID';
   if (!candidates.length) {
     method = 'TEAM_JERSEY_NAME';
-    candidates = roster.filter(player => String(player.UniformNumber || '') === String(groupRow.Uni || '') && groupMatchesPlayer(groupRow, player));
+    const jersey = String(groupRow.Uni || '').trim();
+    candidates = jersey ? roster.filter(player => String(player.UniformNumber || '').trim() === jersey && groupMatchesPlayer(groupRow, player)) : [];
   }
   if (candidates.length !== 1) {
     return {status:candidates.length ? 'AMBIGUOUS_PROVIDER_PLAYER' : 'UNMATCHED_PROVIDER_PLAYER', method, candidates:candidates.length};
@@ -62,9 +82,10 @@ export function resolveSidearmIdentity(groupRow, team, canonicalPlayers = []) {
   if (!canonicalCandidates.length) {
     canonicalMethod = 'FULL_NAME_JERSEY';
     const fullName = normalizeName(`${player.FirstName} ${player.LastName}`);
-    canonicalCandidates = canonicalPlayers.filter(item =>
-      normalizeName(item.name) === fullName && String(item.jersey || '') === String(player.UniformNumber || '')
-    );
+    const jersey = String(player.UniformNumber || '').trim();
+    canonicalCandidates = jersey ? canonicalPlayers.filter(item =>
+      normalizeName(item.name) === fullName && String(item.jersey || '').trim() === jersey
+    ) : [];
   }
   if (canonicalCandidates.length !== 1) {
     return {

@@ -1,0 +1,770 @@
+{
+  "capturedAt": "2026-08-17T06:22:00.857Z",
+  "classification": "PROVISIONAL_FALL_CAMP",
+  "sourceUrl": "https://pvpanthers.com/sports/football/roster",
+  "players": [
+    {
+      "rpId": "8579",
+      "name": "Jaden Allison",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8580",
+      "name": "Austine Anyia",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8646",
+      "name": "Austin Appiah",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8581",
+      "name": "Ja'koby Banks",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8582",
+      "name": "Ray'Quan Bell",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8649",
+      "name": "Mohammed Bility",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8583",
+      "name": "Chase Bingmon",
+      "position": "Running Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8640",
+      "name": "William Blaylock, II",
+      "position": "Tight End",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8650",
+      "name": "Jabraxton Boone",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8584",
+      "name": "Caden Bowers",
+      "position": "Offensive Line",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8895",
+      "name": "Preston Brown",
+      "position": "Quarterback",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8585",
+      "name": "Ty Brown",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8896",
+      "name": "Micah Bryant",
+      "position": "Cornerback",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8586",
+      "name": "Quam Byers",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8587",
+      "name": "Ellis Bynum",
+      "position": "Running Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8652",
+      "name": "Jordan Campbell",
+      "position": "Defensive Line",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8653",
+      "name": "Kamrin Canterbury",
+      "position": "Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8588",
+      "name": "CK Carter",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8654",
+      "name": "Rondell Carter",
+      "position": "Free Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8589",
+      "name": "Tevin Carter",
+      "position": "Quarterback",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8590",
+      "name": "Pedro Chagas da Silva",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8655",
+      "name": "Germonie Davis",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8657",
+      "name": "Jacob Davis",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8656",
+      "name": "Silas Davis",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8591",
+      "name": "Cornelius Davis, Jr.",
+      "position": "Free Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8897",
+      "name": "Bryce Dixon",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8905",
+      "name": "Ethan Eddins",
+      "position": "Kicker/Punter",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8659",
+      "name": "Ledell Finister",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8658",
+      "name": "Braylon Finney",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8593",
+      "name": "Chaney Fitzgerald",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8660",
+      "name": "Dorian Gates",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8661",
+      "name": "Toric Goins, Jr.",
+      "position": "Wide Reciever",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8898",
+      "name": "Isaiah Gordon",
+      "position": "Runningback",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8662",
+      "name": "Trae Grogan",
+      "position": "Free Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8594",
+      "name": "Malik Gucake",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8663",
+      "name": "Jacob Hansen",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8635",
+      "name": "Ky'Yon Harris",
+      "position": "Running Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8664",
+      "name": "Nahamani Harris",
+      "position": "Free Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8595",
+      "name": "Christopher Harvey",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8643",
+      "name": "Immanuel Hawkins",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8597",
+      "name": "Kheagian Heckaman",
+      "position": "Tight End",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8692",
+      "name": "Brandon Heyward",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8666",
+      "name": "Hunter Howard",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8667",
+      "name": "Gabriel Ikechukwu",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8638",
+      "name": "Amarie Jackson",
+      "position": "Running Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8599",
+      "name": "Jayven Jackson",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8668",
+      "name": "Joseph James Jean-Louis",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8600",
+      "name": "Skylon Jean-Louis",
+      "position": "Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8601",
+      "name": "Ethan John",
+      "position": "Tight End",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8669",
+      "name": "Jamie Johnson, Jr.",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8602",
+      "name": "Travon Jones",
+      "position": "Tightend",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8603",
+      "name": "Patrick Kendall, III",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8625",
+      "name": "Jahbari Kuykendall",
+      "position": "Runningback",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8670",
+      "name": "Leo Lane, Jr.",
+      "position": "Free Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8672",
+      "name": "Vysen Lang",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8671",
+      "name": "Akim Lanieux",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8673",
+      "name": "Fitzroy Ledgister",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8900",
+      "name": "Tre Leonard",
+      "position": "Runningback",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8674",
+      "name": "Donovan Malone",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8604",
+      "name": "Molik Mason",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8676",
+      "name": "Tyrone Mathieu, II",
+      "position": "Free Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8677",
+      "name": "Kylin Mathis",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8678",
+      "name": "Damani Maxson",
+      "position": "Free Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8679",
+      "name": "Allan McCarter",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8680",
+      "name": "Damien McDaniel",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8681",
+      "name": "Harrison McKinley",
+      "position": "Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8605",
+      "name": "Calvin McMillian",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8682",
+      "name": "Marley Minerds",
+      "position": "Kicker/Punter",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8606",
+      "name": "Matthew Moore",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8901",
+      "name": "Adam Moore, Jr.",
+      "position": "",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8683",
+      "name": "Tyler Morehead",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8608",
+      "name": "Xyler Myles",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8684",
+      "name": "Kerry North",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8610",
+      "name": "Jahiem O'Hara",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8686",
+      "name": "Brian O'Neal",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8611",
+      "name": "Jalen O'Neal",
+      "position": "Cornerback",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8685",
+      "name": "David Ogudo",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8612",
+      "name": "Ashton Ojiaku",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8613",
+      "name": "Rodny Ojo",
+      "position": "Wide receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8687",
+      "name": "James Owens",
+      "position": "Long Snapper",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8615",
+      "name": "Cameron Pascal",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8902",
+      "name": "Hanziah Rana",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8689",
+      "name": "Mark Rayson, III",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8903",
+      "name": "Darien Rogers",
+      "position": "Quarterback",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8691",
+      "name": "Elias Sanders",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8904",
+      "name": "Anthony Shareef Irons",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8616",
+      "name": "Drew Skartvedt",
+      "position": "Long Snapper",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8906",
+      "name": "Kaeden Smith",
+      "position": "Quarterback",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8618",
+      "name": "William Taylor",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8636",
+      "name": "Tony Terry",
+      "position": "Tight End",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8907",
+      "name": "Corey Thompson, Jr.",
+      "position": "Free Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8694",
+      "name": "Cedric Thornton, Jr.",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8637",
+      "name": "Timothy Timmerman",
+      "position": "Tight End",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8695",
+      "name": "Nicholas Tramble",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8639",
+      "name": "Zayvion Turner-Knox",
+      "position": "Running Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8908",
+      "name": "Bruce Uperesa",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8697",
+      "name": "Chase Walker",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8698",
+      "name": "Jace Ward",
+      "position": "Linebacker",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8699",
+      "name": "Ashtin Watkins",
+      "position": "Tight End",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8619",
+      "name": "Aiden Webb",
+      "position": "Kicker/Punter",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8700",
+      "name": "Cory White",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8620",
+      "name": "David Williams",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8644",
+      "name": "Malachi Williams",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8621",
+      "name": "Xylan Williams",
+      "position": "Wide Receiver",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8702",
+      "name": "Elijah Wilson",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8622",
+      "name": "Reginald Wilson",
+      "position": "Offensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8909",
+      "name": "Aaron Woodard",
+      "position": "Free Safety",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8701",
+      "name": "Demarcus Wynn",
+      "position": "Defensive Lineman",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    },
+    {
+      "rpId": "8623",
+      "name": "Eric Zachery",
+      "position": "Defensive Back",
+      "jersey": "",
+      "sourceUrl": "https://pvpanthers.com/sports/football/roster"
+    }
+  ]
+}
