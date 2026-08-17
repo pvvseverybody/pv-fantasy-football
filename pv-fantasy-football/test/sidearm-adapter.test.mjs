@@ -21,6 +21,14 @@ test('duplicate jersey numbers resolve by team, jersey and compatible name',()=>
   assert.equal(result.playerId,'PV-DB');
 });
 
+test('provider stat names with suffixes resolve to the roster identity',()=>{
+  const team={Players:[{FirstName:'Mandel',LastName:'Eugene Jr.',UniformNumber:'42',PersonId:''}]};
+  const canonical=[{playerId:'PV-42',name:'Mandel Eugene Jr.',team:'PVAMU',jersey:'42'}];
+  const result=resolveSidearmIdentity({Uni:'42',Name:'M. EUGENE JR.',PersonId:''},team,canonical);
+  assert.equal(result.status,'MATCHED');
+  assert.equal(result.playerId,'PV-42');
+});
+
 test('identity ambiguity fails closed',()=>{
   const team={Players:[{FirstName:'Taylor',LastName:'Return',UniformNumber:'4',PersonId:''},{FirstName:'Tara',LastName:'Return',UniformNumber:'4',PersonId:''}]};
   assert.equal(resolveSidearmIdentity({Uni:'4',Name:'T. RETURN'},team,canonicalPlayers).status,'AMBIGUOUS_PROVIDER_PLAYER');

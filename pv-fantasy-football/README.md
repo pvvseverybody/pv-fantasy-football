@@ -53,3 +53,5 @@ Run `npm run certify:l2-transport` to perform the read-only L2 preflight against
 Preflight readiness is not a full L2 pass. During the August 27 live window, L2 must still capture changing 15-second snapshots, corrections, final-state detection, official-stat reconciliation, and proof that polling stops after final.
 
 Run `npm run certify:sidearm-history` to inspect the allowlisted official historical SIDEARM JSONP events, validate the provider-to-GameStats adapter in memory, recheck the staged event identity/date, and regenerate `reports/sidearm-historical-adapter-certification.md`. Forced fumbles, defensive recoveries, and fumble-return touchdowns remain blocked when no proven aggregate provider field or official fallback is available.
+
+`npm run certify:nfl-live` runs the separate ESPN/NFL transport monitor. NFL payloads are never normalized through the SIDEARM adapter. `npm run certify:l3-rice` runs the read-only 2025 Prairie View at Rice identity, normalization, official-book reconciliation, and fantasy-score dry run.

@@ -32,7 +32,8 @@ export function normalizeName(value) {
 
 function groupNameParts(value) {
   const parts = String(value || '').replaceAll(',',' ').trim().split(/\s+/).filter(Boolean);
-  return {first:normalizeName(parts[0]),last:normalizeName(parts.at(-1))};
+  const normalized = parts.map(normalizeName).filter(Boolean);
+  return {first:normalized[0] || '',last:normalized.at(-1) || ''};
 }
 
 function groupMatchesPlayer(groupRow, player) {
