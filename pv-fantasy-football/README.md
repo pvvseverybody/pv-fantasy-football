@@ -77,6 +77,10 @@ The public flow is `/` → passwordless email verification → `/lineup` → `/r
 
 Participant authentication uses the existing `ParticipantSession` A3:K schema and Resend's HTTPS email API. Production requires `PARTICIPANT_AUTH_SECRET` (a long random secret), `RESEND_API_KEY`, and `PARTICIPANT_AUTH_FROM` (a verified sender such as `PV Fantasy <login@your-domain>`). These are server-only secrets and must never use a `NEXT_PUBLIC_` prefix. Production requests and cookies require HTTPS.
 
+Public self-registration uses the same passwordless challenge/session ledger. A registration is held only inside the HMAC-protected challenge metadata until its email code is verified. Finalization writes an inactive candidate to the existing `Participants` A:K schema, rechecks normalized-email, case-insensitive Display Name, and generated Participant ID uniqueness, then activates it with `Identity Status=VERIFIED` and `Duplicate Flag=CLEAR`. `Display Name` is the public Fantasy Team Name; structured `Notes` retains the formal first/last name, terms version/timestamp, and registration provenance. No workbook schema change is required. Email/team uniqueness is fail-closed and strongly guarded, but Google Sheets does not provide a cross-instance conditional transaction, so strict case-insensitive team-name uniqueness must be monitored operationally; conflicting candidates remain inactive for review.
+
+The registration and login routes also apply bounded in-process IP throttles, while the durable challenge ledger enforces a one-minute per-email resend cooldown, ten-minute code expiry, and five-attempt lockout. For internet-scale abuse protection, configure a platform/WAF rate limit in front of `/api/auth/register`, `/api/auth/request`, and `/api/auth/verify`; no paid rate-limit service is required for the controlled 1.0 participant pool.
+
 ## Launch acceptance
 
 - `reports/launch-acceptance-audit.md` is the authoritative pre-deployment audit, environment list, production-data checklist, and launch classification.
