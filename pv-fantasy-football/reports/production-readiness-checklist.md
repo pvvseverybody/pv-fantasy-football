@@ -32,7 +32,7 @@
 - Roster-page `rp_id` has not been proven to equal the live SIDEARM `PersonId`.
 - Live/provisional SIDEARM summary payloads still do not provide proven FF, FR, or fumble-return-TD player fields.
 - Final publication must wait for a reconciled official final-stat-book fallback when those fields are absent live.
-- Registered email alone does not prove control of a participant identity for lineup writes; an approved authenticated participant-session method is required for launch.
+- Passwordless registered-email verification and opaque server sessions are implemented; production still requires Resend sender verification and participant-auth secrets.
 
 ## Nice-to-have / non-blocking
 

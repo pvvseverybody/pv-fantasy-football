@@ -2,6 +2,8 @@ import {NextResponse} from 'next/server';
 import {readSheetRange} from '../../../lib/google-sheets';
 import {LINEUP_SLOTS, saveLineupSubmission} from '../../../lib/lineup-submissions';
 import {dateToSheetsSerial, promoteLineupSubmission} from '../../../lib/authoritative-lineups';
+import {AUTH_COOKIE,bindAuthenticatedLineup,cookieValue,requiredAuthConfig,secureRequest} from '../../../lib/participant-auth.mjs';
+import {participantAuthService} from '../../../lib/participant-auth-service';
 
 const SLOT_POS = {
   RB:['RB'], WR:['WR'], TE:['TE'], 'Offensive Flex':['QB','RB','WR','TE'],
@@ -11,12 +13,13 @@ const SLOT_POS = {
 export async function POST(request) {
   let rawSaved = false;
   try {
+    if(!secureRequest(request))return NextResponse.json({accepted:false,code:'HTTPS_REQUIRED',message:'A secure connection is required.'},{status:400});
+    requiredAuthConfig();
+    const authenticated=await participantAuthService().authenticate(cookieValue(request,AUTH_COOKIE));
+    if(!authenticated)return NextResponse.json({accepted:false,code:'UNAUTHENTICATED',message:'Sign in again before submitting a lineup.'},{status:401});
     const body = await request.json();
-    const email = String(body.email || '').trim().toLowerCase();
-    const gameId = String(body.game_id || '').trim();
-    const picks = body.picks || {};
+    const {email,gameId,picks}=bindAuthenticatedLineup(body,authenticated);
 
-    if (!email || !email.includes('@')) return NextResponse.json({accepted:false,code:'INVALID_IDENTITY',message:'Enter a valid email.'},{status:400});
     if (!gameId) return NextResponse.json({accepted:false,code:'INVALID_GAME',message:'Choose a game.'},{status:400});
 
     const games = await readSheetRange('Games!A3:M40', {valueRenderOption:'UNFORMATTED_VALUE'});
@@ -72,15 +75,14 @@ export async function POST(request) {
       message:promoted.duplicate ? 'This lineup was already accepted.' : 'Lineup submitted and accepted.',
       game_id:gameId,
       submission_id:saved.submissionId,
-      participant_id:promoted.participantId,
       version:promoted.version
     }, {status:promoted.duplicate ? 200 : 201});
   } catch (error) {
     console.error('POST /api/lineup failed:', error);
     const code = error.code || 'SERVER_ERROR';
-    const status = ['INVALID_IDENTITY','IDENTITY_REVIEW_REQUIRED'].includes(code) ? 400 :
+    const status = code === 'AUTH_NOT_CONFIGURED' ? 503 : ['INVALID_IDENTITY','IDENTITY_REVIEW_REQUIRED'].includes(code) ? 400 :
       code === 'LATE_SUBMISSION' ? 409 : 500;
-    const message = code === 'INVALID_IDENTITY' ? 'This email is not registered for lineup entry.' :
+    const message = code === 'AUTH_NOT_CONFIGURED' ? 'Participant authentication is unavailable.' : code === 'INVALID_IDENTITY' ? 'This authenticated participant is not eligible for lineup entry.' :
       code === 'IDENTITY_REVIEW_REQUIRED' ? 'This identity requires commissioner review.' :
       code === 'LATE_SUBMISSION' ? 'The submission cutoff has passed.' :
       'The lineup was recorded but could not be promoted to the authoritative lineup. Please retry.';

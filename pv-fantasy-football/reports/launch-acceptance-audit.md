@@ -6,7 +6,7 @@ Production workbook access during this audit was read-only.
 
 ## Executive decision
 
-The application compiles and the certified lineup/scoring invariants remain intact. The public navigation and every declared route resolve. Three launch decisions/data corrections remain: participant write authentication, replacement of demo-only participant data with approved real participants, and correction of game identity drift across production control tables.
+The application compiles and the certified lineup/scoring invariants remain intact. The public navigation and every declared route resolve. Participant write authentication has been closed with passwordless email verification and an opaque server-validated session. Two production-data corrections remain: replacement of demo-only participant data with approved real participants and correction of game identity drift across production control tables.
 
 The official 2026 schedule confirms W0 is Prairie View at Tarleton State on August 29 at 8:00 PM CT. The `Games` table matches the official schedule for the sampled rows. The current `FeedControl` and `Reconciliation` rows do not consistently match those `Game ID`/opponent pairs. Source: https://pvpanthers.com/sports/football/schedule/2026
 
@@ -21,7 +21,7 @@ The official 2026 schedule confirms W0 is Prairie View at Tarleton State on Augu
 5. `/results` uses read-only `POST /api/results`; it does not return emails or participant IDs and hides picks while entries remain open.
 6. `/leaderboard` uses `GET /api/leaderboard`; demo/test records are filtered and public status is reduced to participant-safe labels.
 
-Result: route and data flow are coherent. Launch risk: knowledge of a participant email is currently sufficient to submit or replace that participant's lineup.
+Result: route and data flow are coherent. Registered email alone no longer authorizes writes; the participant must verify a short-lived code delivered to the registered inbox.
 
 ### PV Fantasy administrator
 
@@ -65,7 +65,7 @@ No dead public navigation targets were found. No public link points to the admin
 
 ## Defects and findings
 
-1. **Participant write authentication — unresolved launch blocker.** Normalized email identifies the participant but does not prove control of the identity. A person who knows another participant's email could replace that lineup before kickoff. Resolve with an approved authenticated participant session (for example magic-link/OTP or another verified sign-in); do not put a shared secret in client JavaScript.
+1. **Participant write authentication — resolved.** A generic, enumeration-resistant login request sends a six-digit code to a registered inbox. The code is HMAC-hashed, expires after ten minutes, and is limited to five attempts. Successful verification creates an opaque seven-day session whose hash and status are stored in the existing `ParticipantSession` ledger; the browser receives only a Secure, HttpOnly, SameSite=Strict cookie. Lineup/results identity is derived from the active verified session.
 2. **Production participants — unresolved launch blocker.** The sampled production `Participants` table contains only `DEMO-001`, explicitly marked for deletion/replacement before launch. Public APIs correctly suppress it, leaving no real participant able to submit.
 3. **Game/control identity drift — unresolved launch blocker.** `Games` correctly starts with W0 Tarleton State, W1 Texas Southern, W2 Baylor, W3 SFA, W4 Grambling State. Sampled control rows include `2026-W2` paired with Texas Southern, `2026-W4` paired with SFA, and `Reconciliation 2026-W1` paired with Tarleton State. Correct and revalidate all IDs, opponents, provider event IDs, and kickoff times before enabling runners or scoring.
 4. **Countdown timezone — fixed.** The client previously interpreted Central Time text in the device timezone. It now converts explicit `America/Chicago` wall time and has daylight/standard-time tests.
@@ -85,6 +85,9 @@ No dead public navigation targets were found. No public link points to the admin
 | `SCORING_PIPELINE_SECRET` | Required for scoring | Authorizes `/api/scoring` | Long random server secret |
 | `PV_ADMIN_USERNAME` | Required for admin | Admin Basic-auth identity | Server only |
 | `PV_ADMIN_PASSWORD` | Required for admin | Admin Basic-auth credential | Long unique encrypted server secret |
+| `PARTICIPANT_AUTH_SECRET` | Required for participant login, lineup writes, personal results | HMAC secret for verification codes | Long random encrypted server secret |
+| `RESEND_API_KEY` | Required for participant login | Sends verification email through Resend | Encrypted server secret |
+| `PARTICIPANT_AUTH_FROM` | Required for participant login | Verified sender identity | Server configuration; domain must be verified |
 | `LINEUP_SUBMISSIONS_SHEET` | Optional | Overrides `Lineup Submissions` tab name | Defaults to `Lineup Submissions` |
 
 There are no required `NEXT_PUBLIC_*` variables. Repository scans found no committed private key, API key, admin password, scoring secret, personal consumer email address, `.env` file, credential JSON, or PEM file. Test-only literal passwords are non-production fixtures. Server error logging does not intentionally log request bodies or credentials.
@@ -107,7 +110,6 @@ The repository now includes a pinned pnpm version, lockfile, and patched `sharp`
 
 ### BLOCKS LAUNCH
 
-- Approve and implement participant authentication for lineup writes; registered email alone is not sufficient proof of identity.
 - Provision approved real participants and remove/deactivate the demo participant before opening public entry.
 - Correct and certify every production game identity across `Games`, `FeedControl`, `RunnerState`, and `Reconciliation`; confirm which games should actually be `OPEN`.
 

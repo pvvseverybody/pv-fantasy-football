@@ -26,10 +26,12 @@ Use this checklist against a preview/staging deployment connected to an isolated
 - [ ] `/` loads without console errors and shows PV branding, next game, kickoff, and entry status.
 - [ ] Every public navigation link resolves: Lineup, My Results, Leaderboard, Players.
 - [ ] No public page links to `/admin` or exposes provider/gate/workbook details.
-- [ ] Invalid email stays on identification with a clear message.
-- [ ] Approved registered email advances directly to game selection.
-- [ ] Refreshing within the same browser session preserves identification without placing the email in the URL.
-- [ ] Closing the browser session clears the convenience identity as expected.
+- [ ] Malformed email is rejected by browser validation.
+- [ ] Registered and unregistered well-formed emails receive the same generic request response and equivalent challenge cookie behavior.
+- [ ] The registered inbox receives a six-digit code; an unregistered address receives nothing.
+- [ ] Invalid/expired code is rejected without identifying whether the address is registered.
+- [ ] Valid code establishes the secure session and advances to game selection.
+- [ ] Refreshing preserves the HttpOnly session without placing email or token in the URL or browser storage.
 
 ## Game selection and lock display
 

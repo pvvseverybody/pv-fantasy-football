@@ -30,6 +30,7 @@ export function submissionOutcome(response, httpOk=true) {
   if (httpOk && response?.accepted) return {state:'success', title:'Lineup saved', message:'Your lineup is accepted for this game.'};
   const code = response?.code;
   if (code === 'PICKS_CLOSED' || code === 'LATE_SUBMISSION') return {state:'locked', title:'Lineup locked', message:response?.message || 'The lineup deadline has passed.'};
+  if (code === 'UNAUTHENTICATED') return {state:'identity', title:'Secure sign-in required', message:'Sign in again before submitting your lineup.'};
   if (code === 'INVALID_IDENTITY' || code === 'IDENTITY_REVIEW_REQUIRED') return {state:'identity', title:'Participant not recognized', message:response?.message || 'This participant cannot submit a lineup.'};
   if (code === 'INVALID_LINEUP') {
     const duplicate = /cannot be used twice/i.test(response?.message || '');

@@ -73,7 +73,9 @@ The status surface reads existing `Games`, feed/runner, ingestion QA, lineup/ver
 
 ## Participant experience
 
-The public flow is `/` → `/lineup` → `/results` or `/leaderboard`. Participant identity is entered as the registered email and retained only in browser session storage for navigation convenience. `/api/lineup` remains the only public mutation endpoint. `/api/results` performs a read-only server-side identity lookup and returns only the participant display name, accepted scoring-version lineup, public player information, and scores; it never returns email or participant identifiers. `/api/leaderboard` returns public weekly and cumulative standings. Demo/test participant records are excluded from both public result APIs.
+The public flow is `/` → passwordless email verification → `/lineup` → `/results` or `/leaderboard`. A six-digit code is delivered only to the registered inbox and exchanged for an opaque server-validated session stored in a Secure, HttpOnly, SameSite=Strict cookie. `/api/lineup` remains the only public lineup mutation endpoint and derives participant identity exclusively from that session; browser-supplied email or participant identifiers are ignored. `/api/results` uses the same session and never returns email or canonical participant identifiers. `/api/leaderboard` returns public weekly and cumulative standings. Demo/test participant records are excluded from both public result APIs.
+
+Participant authentication uses the existing `ParticipantSession` A3:K schema and Resend's HTTPS email API. Production requires `PARTICIPANT_AUTH_SECRET` (a long random secret), `RESEND_API_KEY`, and `PARTICIPANT_AUTH_FROM` (a verified sender such as `PV Fantasy <login@your-domain>`). These are server-only secrets and must never use a `NEXT_PUBLIC_` prefix. Production requests and cookies require HTTPS.
 
 ## Launch acceptance
 

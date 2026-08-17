@@ -78,3 +78,10 @@ export async function appendSheetRow(range, row) {
     }
   );
 }
+
+export async function writeSheetRange(range, values) {
+  return sheetsRequest(`values/${encodeURIComponent(range)}?valueInputOption=RAW`, {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({majorDimension:'ROWS', values}),
+  });
+}
