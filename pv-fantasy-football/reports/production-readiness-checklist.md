@@ -12,7 +12,7 @@
 
 - August 20 NFL transport-only live window using the unattended runner.
 - Actual request outages/recovery, numeric corrections, live transitions, three consecutive finals, and automatic final shutdown.
-- August 27 Prairie View SIDEARM L2/L3 live behavior and official-final publication gates.
+- August 29 Prairie View at Tarleton State live-provider behavior and official-final publication gates. The earlier SIDEARM transport certificate remains separate and must not be assumed to certify Tarleton's production provider.
 - PV roster status is **PROVISIONAL_FALL_CAMP**. The reusable read-only reconciliation is ready, but finalized registry migration waits for a later, more complete official roster publication.
 
 ## Requires workbook/configuration change
@@ -24,12 +24,15 @@
 - Populate jerseys only after Prairie View publishes authoritative values. Missing jerseys are expected in `PROVISIONAL_FALL_CAMP`, not defects.
 - Review four material position differences before changing fantasy eligibility.
 - Configure an external supervisor/task host to start and retain the August 20 unattended process; local code alone cannot survive a powered-off or sleeping machine.
+- Correct the current `FeedControl`/`Reconciliation` game-opponent drift against authoritative `Games` before enabling any production runner.
+- Provision approved real participants and remove/deactivate the demo-only participant before public entry opens.
 
 ## Unresolved blocker
 
 - Roster-page `rp_id` has not been proven to equal the live SIDEARM `PersonId`.
 - Live/provisional SIDEARM summary payloads still do not provide proven FF, FR, or fumble-return-TD player fields.
 - Final publication must wait for a reconciled official final-stat-book fallback when those fields are absent live.
+- Registered email alone does not prove control of a participant identity for lineup writes; an approved authenticated participant-session method is required for launch.
 
 ## Nice-to-have / non-blocking
 

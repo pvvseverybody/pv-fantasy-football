@@ -1,5 +1,18 @@
 export const LINEUP_SLOTS = ['RB','WR','TE','Offensive Flex','DL','LB','DB','Defensive Flex'];
 
+export function centralKickoffEpoch(value) {
+  const match=String(value||'').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if(!match)return null;
+  const [,month,day,year,hour,minute,meridiem]=match;let hours=Number(hour)%12;if(meridiem.toUpperCase()==='PM')hours+=12;
+  const wallClockUtc=Date.UTC(Number(year),Number(month)-1,Number(day),hours,Number(minute));
+  try{
+    const zoneName=new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',timeZoneName:'shortOffset'}).formatToParts(new Date(wallClockUtc)).find(part=>part.type==='timeZoneName')?.value||'';
+    const offset=zoneName.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);if(!offset)return null;
+    const minutes=(Number(offset[2])*60+Number(offset[3]||0))*(offset[1]==='-'?-1:1);
+    return wallClockUtc-minutes*60000;
+  }catch{return null;}
+}
+
 export function playerLabel(player) {
   return [player.display_name, player.position, player.jersey ? `#${player.jersey}` : ''].filter(Boolean).join(' • ');
 }

@@ -74,3 +74,9 @@ The status surface reads existing `Games`, feed/runner, ingestion QA, lineup/ver
 ## Participant experience
 
 The public flow is `/` → `/lineup` → `/results` or `/leaderboard`. Participant identity is entered as the registered email and retained only in browser session storage for navigation convenience. `/api/lineup` remains the only public mutation endpoint. `/api/results` performs a read-only server-side identity lookup and returns only the participant display name, accepted scoring-version lineup, public player information, and scores; it never returns email or participant identifiers. `/api/leaderboard` returns public weekly and cumulative standings. Demo/test participant records are excluded from both public result APIs.
+
+## Launch acceptance
+
+- `reports/launch-acceptance-audit.md` is the authoritative pre-deployment audit, environment list, production-data checklist, and launch classification.
+- `reports/browser-acceptance-checklist.md` is the executable device and workflow acceptance script.
+- `reports/game-day-operator-runbook.md` is the non-developer game-day operating procedure.

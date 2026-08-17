@@ -1,10 +1,10 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 import SiteHeader from '../components/SiteHeader';
-import {LINEUP_SLOTS,playerLabel,submissionOutcome,validateLineupDraft} from '../../lib/participant-experience.mjs';
+import {LINEUP_SLOTS,centralKickoffEpoch,playerLabel,submissionOutcome,validateLineupDraft} from '../../lib/participant-experience.mjs';
 
 const GROUPS=[['OFFENSE',['RB','WR','TE','Offensive Flex']],['DEFENSE',['DL','LB','DB','Defensive Flex']]];
-const parseKickoff=value=>{const parsed=Date.parse(value);return Number.isFinite(parsed)?parsed:null};
+const parseKickoff=centralKickoffEpoch;
 function deadlineText(game,now){if(!game)return'';if(game.pick_status!=='OPEN')return'Lineup locked';const kickoff=parseKickoff(game.kickoff_ct);if(!kickoff)return'Open until kickoff';const distance=kickoff-now;if(distance<=0)return'Lineup locked';const days=Math.floor(distance/86400000),hours=Math.floor(distance/3600000)%24,minutes=Math.floor(distance/60000)%60;return`${days?`${days}d `:''}${hours}h ${minutes}m until lock`;}
 
 export default function LineupBuilder(){

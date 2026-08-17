@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {LINEUP_SLOTS,participantResults,participantStatusLabel,playerLabel,publicLeaderboard,submissionOutcome,validateLineupDraft} from '../lib/participant-experience.mjs';
+import {LINEUP_SLOTS,centralKickoffEpoch,participantResults,participantStatusLabel,playerLabel,publicLeaderboard,submissionOutcome,validateLineupDraft} from '../lib/participant-experience.mjs';
 
 test('draft requires eight unique player selections',()=>{
   assert.equal(validateLineupDraft({}).code,'INCOMPLETE_LINEUP');
@@ -13,6 +13,12 @@ test('draft requires eight unique player selections',()=>{
 test('player labels omit unpublished jersey numbers',()=>{
   assert.equal(playerLabel({display_name:'PV Player',position:'LB',jersey:''}),'PV Player • LB');
   assert.equal(playerLabel({display_name:'PV Player',position:'LB',jersey:'4'}),'PV Player • LB • #4');
+});
+
+test('lineup countdown parses kickoff explicitly in America/Chicago',()=>{
+  assert.equal(new Date(centralKickoffEpoch('8/29/2026 8:00 PM')).toISOString(),'2026-08-30T01:00:00.000Z');
+  assert.equal(new Date(centralKickoffEpoch('11/7/2026 2:00 PM')).toISOString(),'2026-11-07T20:00:00.000Z');
+  assert.equal(centralKickoffEpoch('TBA'),null);
 });
 
 test('submission outcomes distinguish all authoritative participant states',()=>{
