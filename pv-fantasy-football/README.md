@@ -70,3 +70,7 @@ Run `npm run certify:sidearm-history` to inspect the allowlisted official histor
 If either variable is missing, both paths fail closed with HTTP 503. Invalid credentials receive HTTP 401. Use HTTPS in every deployed environment, store these values only in the hosting platform's encrypted server environment, and never create `NEXT_PUBLIC_` copies. Rotate the credentials if they are shared or exposed.
 
 The status surface reads existing `Games`, feed/runner, ingestion QA, lineup/version, scoring, reconciliation, invariant, and publication-control tables. It has no production mutation actions. A provider final signal is never sufficient for `READY`: official-final verification, normalized-stat completeness, identity resolution, exactly eight accepted scoring picks, score reconciliation, passing gates/invariants, `READY_TO_LOCK`, and explicit `PublishControl` release are also required.
+
+## Participant experience
+
+The public flow is `/` → `/lineup` → `/results` or `/leaderboard`. Participant identity is entered as the registered email and retained only in browser session storage for navigation convenience. `/api/lineup` remains the only public mutation endpoint. `/api/results` performs a read-only server-side identity lookup and returns only the participant display name, accepted scoring-version lineup, public player information, and scores; it never returns email or participant identifiers. `/api/leaderboard` returns public weekly and cumulative standings. Demo/test participant records are excluded from both public result APIs.

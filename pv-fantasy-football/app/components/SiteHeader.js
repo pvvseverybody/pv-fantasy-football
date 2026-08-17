@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function SiteHeader(){return <><header className="siteHeader"><Link className="brand" href="/"><span>PV</span><strong>Fantasy Football</strong></Link><div className="brandTag">PV vs Everybody</div></header><nav className="siteNav" aria-label="Primary"><Link href="/lineup">Lineup</Link><Link href="/results">My Results</Link><Link href="/leaderboard">Leaderboard</Link><Link href="/players">Players</Link></nav></>}

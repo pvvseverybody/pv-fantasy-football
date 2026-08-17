@@ -1,0 +1,53 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {LINEUP_SLOTS,participantResults,participantStatusLabel,playerLabel,publicLeaderboard,submissionOutcome,validateLineupDraft} from '../lib/participant-experience.mjs';
+
+test('draft requires eight unique player selections',()=>{
+  assert.equal(validateLineupDraft({}).code,'INCOMPLETE_LINEUP');
+  const picks=Object.fromEntries(LINEUP_SLOTS.map((slot,index)=>[slot,`P${index}`]));
+  assert.equal(validateLineupDraft(picks).valid,true);
+  picks['Defensive Flex']=picks.RB;
+  assert.equal(validateLineupDraft(picks).code,'DUPLICATE_PLAYER');
+});
+
+test('player labels omit unpublished jersey numbers',()=>{
+  assert.equal(playerLabel({display_name:'PV Player',position:'LB',jersey:''}),'PV Player • LB');
+  assert.equal(playerLabel({display_name:'PV Player',position:'LB',jersey:'4'}),'PV Player • LB • #4');
+});
+
+test('submission outcomes distinguish all authoritative participant states',()=>{
+  assert.equal(submissionOutcome({accepted:true,version:1},true).state,'success');
+  assert.equal(submissionOutcome({accepted:true,version:2},true).state,'updated');
+  assert.equal(submissionOutcome({accepted:true,duplicate:true},true).state,'duplicate');
+  assert.equal(submissionOutcome({code:'PICKS_CLOSED'},false).state,'locked');
+  assert.equal(submissionOutcome({code:'INVALID_IDENTITY'},false).state,'identity');
+  assert.equal(submissionOutcome({code:'INVALID_LINEUP',message:'A player cannot be used twice.'},false).state,'duplicate-error');
+  assert.equal(submissionOutcome({code:'INVALID_LINEUP',message:'Player is not eligible for RB.'},false).state,'ineligible');
+  assert.equal(submissionOutcome({},false).state,'failure');
+});
+
+test('public leaderboard excludes demo data and ranks valid weekly scores',()=>{
+  const result=publicLeaderboard({games:[{Week:'W1','Pick Status':'OPEN'}],weekly:[{'Participant ID':'DEMO-1','Display Name':'Demo Participant',Week:'W1','Fantasy Score':99,Validation:'VALID'},{'Participant ID':'P1','Display Name':'Panther One',Week:'W1','Fantasy Score':18,Validation:'VALID'},{'Participant ID':'P2','Display Name':'Panther Two',Week:'W1','Fantasy Score':24,Validation:'VALID'}],leaderboard:[{Rank:1,'Participant ID':'P2','Display Name':'Panther Two',Total:24,Avg:24,'Best Week':24}]});
+  assert.deepEqual(result.weekly.map(row=>row.participant),['Panther Two','Panther One']);
+  assert.equal(result.cumulative.length,1);
+});
+
+test('participant score labels honor final publication without exposing gates',()=>{
+  assert.equal(participantStatusLabel({'Pick Status':'OPEN','Stats Final?':'NO'},'HOLD'),'PREGAME');
+  assert.equal(participantStatusLabel({'Pick Status':'LOCKED','Stats Final?':'NO'},'HOLD'),'LIVE • PROVISIONAL');
+  assert.equal(participantStatusLabel({'Stats Final?':'YES'},'HOLD'),'FINAL • VERIFYING STATS');
+  assert.equal(participantStatusLabel({'Stats Final?':'YES'},'PUBLISH'),'FINAL • OFFICIAL');
+});
+
+test('participant results expose only accepted scoring-version picks',()=>{
+  const base={participants:[{'Participant ID':'PART-1','Display Name':'Panther One',Email:'one@example.com','Normalized Email':'one@example.com',Active:'YES','Identity Status':'VERIFIED'}],active:[{'Game ID':'G1',Week:'W1','Participant ID':'PART-1','Active Submission ID':'SUB2','Accepted?':'YES','Scoring Version?':'YES','Fantasy Score':12}],picks:[{'Game ID':'G1','Submission ID':'SUB1','Player ID':'OLD','Slot ID':'RB','Valid?':'YES','Scoring Version?':'NO','Submission State':'SUPERSEDED'},{'Game ID':'G1','Submission ID':'SUB2','Player ID':'P1','Slot ID':'RB','Valid?':'YES','Scoring Version?':'YES','Submission State':'ACCEPTED','Fantasy Points':12}],scores:[{'Game ID':'G1','Player ID':'P1',TOTAL:12}],weekly:[{'Game ID':'G1','Participant ID':'PART-1','Fantasy Score':12,Validation:'VALID'}],games:[{'Game ID':'G1',Opponent:'Opponent','Kickoff (CT)':'date'}],players:[{'Player ID':'P1','Player Name':'Current Player',Position:'RB',Jersey:''}]};
+  const result=participantResults(base,'ONE@example.com');
+  assert.equal(result.display_name,'Panther One');
+  assert.deepEqual(result.lineups[0].players.map(player=>player.name),['Current Player']);
+  assert.equal(participantResults(base,'unknown@example.com'),null);
+});
+
+test('participant results do not reveal picks while entry remains open',()=>{
+  const fixture={participants:[{'Participant ID':'PART-1','Display Name':'Panther One',Email:'one@example.com',Active:'YES','Identity Status':'VERIFIED'}],active:[{'Game ID':'G1','Participant ID':'PART-1','Accepted?':'YES','Scoring Version?':'YES'}],games:[{'Game ID':'G1','Pick Status':'OPEN'}]};
+  assert.deepEqual(participantResults(fixture,'one@example.com').lineups,[]);
+});

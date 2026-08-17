@@ -1,57 +1,28 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
+import SiteHeader from '../components/SiteHeader';
+import {LINEUP_SLOTS,playerLabel,submissionOutcome,validateLineupDraft} from '../../lib/participant-experience.mjs';
 
-const SLOTS = ['RB','WR','TE','Offensive Flex','DL','LB','DB','Defensive Flex'];
+const GROUPS=[['OFFENSE',['RB','WR','TE','Offensive Flex']],['DEFENSE',['DL','LB','DB','Defensive Flex']]];
+const parseKickoff=value=>{const parsed=Date.parse(value);return Number.isFinite(parsed)?parsed:null};
+function deadlineText(game,now){if(!game)return'';if(game.pick_status!=='OPEN')return'Lineup locked';const kickoff=parseKickoff(game.kickoff_ct);if(!kickoff)return'Open until kickoff';const distance=kickoff-now;if(distance<=0)return'Lineup locked';const days=Math.floor(distance/86400000),hours=Math.floor(distance/3600000)%24,minutes=Math.floor(distance/60000)%60;return`${days?`${days}d `:''}${hours}h ${minutes}m until lock`;}
 
 export default function LineupBuilder(){
-  const [players,setPlayers]=useState([]);
-  const [games,setGames]=useState([]);
-  const [email,setEmail]=useState('');
-  const [game,setGame]=useState('');
-  const [picks,setPicks]=useState({});
-  const [msg,setMsg]=useState('');
-  const [busy,setBusy]=useState(false);
-
-  useEffect(()=>{Promise.all([
-    fetch('/api/players').then(r=>r.json()),
-    fetch('/api/game-hub').then(r=>r.json())
-  ]).then(([p,g])=>{setPlayers(p.players||[]);setGames((g.games||[]).filter(x=>x.pick_status==='OPEN'));});},[]);
-
-  const used=useMemo(()=>new Set(Object.values(picks)),[picks]);
-  function options(slot){
-    return players.filter(p=>p.eligible_slots.includes(slot) && (!used.has(p.player_key) || picks[slot]===p.player_key));
-  }
-  async function submit(e){
-    e.preventDefault(); setBusy(true); setMsg('');
-    const r=await fetch('/api/lineup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,game_id:game,picks})});
-    const d=await r.json(); setMsg(d.message||'No response'); setBusy(false);
-  }
-
-  return <main className="lineupPage">
-    <section className="lineupHero">
-      <div className="eyebrow">PV FANTASY FOOTBALL</div>
-      <h1>Build Your Lineup</h1>
-      <p>Choose one player for every slot. Players cannot be used twice.</p>
-    </section>
-    <form className="lineupCard" onSubmit={submit}>
-      <div className="lineupIdentity">
-        <label>Email<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label>
-        <label>Game<select required value={game} onChange={e=>setGame(e.target.value)}>
-          <option value="">Select game</option>
-          {games.map(g=><option key={g.game_id} value={g.game_id}>{g.week} — {g.opponent} — {g.kickoff_ct}</option>)}
-        </select></label>
-      </div>
-      <div className="slotGrid">
-        {SLOTS.map(slot=><label className="slot" key={slot}>
-          <span>{slot}</span>
-          <select required value={picks[slot]||''} onChange={e=>setPicks({...picks,[slot]:e.target.value})}>
-            <option value="">Select player</option>
-            {options(slot).map(p=><option key={p.player_key} value={p.player_key}>{p.display_name} — {p.position} — {p.class_year}</option>)}
-          </select>
-        </label>)}
-      </div>
-      <button className="submitLineup" disabled={busy}>{busy?'Submitting…':'Submit Lineup'}</button>
-      {msg && <div className="lineupMessage">{msg}</div>}
-    </form>
-  </main>
+  const [players,setPlayers]=useState([]),[games,setGames]=useState([]),[email,setEmail]=useState(''),[gameId,setGameId]=useState(''),[picks,setPicks]=useState({}),[step,setStep]=useState(1),[busy,setBusy]=useState(false),[outcome,setOutcome]=useState(null),[loadError,setLoadError]=useState(''),[now,setNow]=useState(Date.now());
+  useEffect(()=>{const stored=sessionStorage.getItem('pv-participant-email')||'';setEmail(stored);if(stored)setStep(2);Promise.all([fetch('/api/players').then(async r=>{if(!r.ok)throw new Error();return r.json()}),fetch('/api/game-hub').then(async r=>{if(!r.ok)throw new Error();return r.json()})]).then(([playerData,gameData])=>{setPlayers(playerData.players||[]);setGames(gameData.games||[]);const open=(gameData.games||[]).find(game=>game.pick_status==='OPEN');if(open)setGameId(open.game_id)}).catch(()=>setLoadError('The live player pool or schedule is unavailable. Please retry shortly.'));const timer=setInterval(()=>setNow(Date.now()),30000);return()=>clearInterval(timer);},[]);
+  const game=games.find(item=>item.game_id===gameId);const used=useMemo(()=>new Set(Object.values(picks).filter(Boolean)),[picks]);const draft=validateLineupDraft(picks);const locked=!game||game.pick_status!=='OPEN'||(parseKickoff(game.kickoff_ct)!==null&&parseKickoff(game.kickoff_ct)<=now);
+  function choose(slot,value){setPicks(current=>({...current,[slot]:value}));setOutcome(null)}
+  function continueFromIdentity(){if(!email.includes('@'))return setOutcome({state:'identity',title:'Enter your registered email',message:'A valid participant email is required.'});sessionStorage.setItem('pv-participant-email',email.trim().toLowerCase());setOutcome(null);setStep(2)}
+  function continueToReview(){const check=validateLineupDraft(picks);if(!check.valid)return setOutcome({state:check.code==='DUPLICATE_PLAYER'?'duplicate-error':'incomplete',title:check.code==='DUPLICATE_PLAYER'?'Player selected twice':'Complete all eight slots',message:check.message});setOutcome(null);setStep(4)}
+  async function submit(){setBusy(true);setOutcome(null);try{const response=await fetch('/api/lineup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email.trim(),game_id:gameId,picks})});const data=await response.json().catch(()=>({}));const result=submissionOutcome(data,response.ok);setOutcome(result);if(data.accepted)setStep(5)}catch{setOutcome(submissionOutcome({},false))}finally{setBusy(false)}}
+  const selected=slot=>players.find(player=>player.player_key===picks[slot]);
+  return <main className="publicPage"><SiteHeader/><section className="lineupShell"><div className="pageIntro"><p className="eyebrow">ENTER YOUR LINEUP</p><h1>{step===5?'You’re in.':'Build your eight.'}</h1><div className="stepRail" aria-label="Lineup progress">{['Identify','Game','Lineup','Review','Done'].map((label,index)=><span className={step>=index+1?'active':''} key={label}>{label}</span>)}</div></div>
+    {loadError&&<div className="stateMessage failure"><strong>Unable to load lineup</strong><p>{loadError}</p></div>}
+    {step===1&&<section className="flowCard"><h2>Identify participant</h2><p>Enter the email registered for your season entry.</p><label><span>Email</span><input type="email" autoComplete="email" value={email} onChange={event=>setEmail(event.target.value)} placeholder="you@example.com"/></label><button onClick={continueFromIdentity}>Continue</button></section>}
+    {step===2&&<section className="flowCard"><h2>Select game</h2><div className="gameList">{games.map(item=><button type="button" className={`gameChoice ${gameId===item.game_id?'selected':''}`} key={item.game_id} onClick={()=>setGameId(item.game_id)}><span>{item.week} • {item.site}</span><strong>PV vs {item.opponent}</strong><small>{item.kickoff_ct}</small><b className={item.pick_status==='OPEN'?'statusOpen':'statusLocked'}>{item.pick_status}</b></button>)}</div>{game&&<div className={`deadline ${locked?'locked':'open'}`}>{deadlineText(game,now)}</div>}<button disabled={!gameId||locked} onClick={()=>setStep(3)}>Build this lineup</button></section>}
+    {step===3&&<section className="flowCard lineupBuild"><div className="matchStrip"><div><span>{game?.week}</span><strong>PV vs {game?.opponent}</strong><small>{game?.kickoff_ct}</small></div><b className={locked?'statusLocked':'statusOpen'}>{deadlineText(game,now)}</b></div>{GROUPS.map(([group,slots])=><div className="positionGroup" key={group}><h2>{group}</h2><div className="slotGrid">{slots.map(slot=><label className={`slot ${picks[slot]?'filled':''}`} key={slot}><span>{slot}</span><select aria-label={slot} disabled={locked} value={picks[slot]||''} onChange={event=>choose(slot,event.target.value)}><option value="">Select player</option>{players.filter(player=>player.eligible_slots.includes(slot)).map(player=>{const unavailable=used.has(player.player_key)&&picks[slot]!==player.player_key;return <option disabled={unavailable} key={player.player_key} value={player.player_key}>{playerLabel(player)}{unavailable?' • Selected':''}</option>})}</select></label>)}</div></div>)}<button disabled={locked} onClick={continueToReview}>Review lineup</button></section>}
+    {step===4&&<section className="flowCard"><div className="matchStrip"><div><span>REVIEW • {game?.week}</span><strong>PV vs {game?.opponent}</strong><small>{game?.kickoff_ct}</small></div><b className={locked?'statusLocked':'statusOpen'}>{deadlineText(game,now)}</b></div><div className="reviewList">{LINEUP_SLOTS.map(slot=>{const player=selected(slot);return <article key={slot}><span>{slot}</span><div><strong>{player?.display_name}</strong><small>{[player?.position,player?.jersey?`#${player.jersey}`:''].filter(Boolean).join(' • ')}</small></div></article>})}</div><div className="buttonRow"><button className="secondaryButton" onClick={()=>setStep(3)}>Edit lineup</button><button disabled={busy||locked||!draft.valid} onClick={submit}>{busy?'Confirming…':'Submit lineup'}</button></div><p className="acceptanceNote">Your lineup is saved only after the authoritative system confirms acceptance.</p></section>}
+    {step===5&&<section className="flowCard confirmation"><div className={`confirmationMark ${outcome?.state}`}>✓</div><p className="eyebrow">AUTHORITATIVE CONFIRMATION</p><h2>{outcome?.title}</h2><p>{outcome?.message}</p><div className="confirmationMeta"><span>{game?.week}</span><strong>PV vs {game?.opponent}</strong><small>{game?.kickoff_ct}</small></div><div className="buttonRow"><a className="buttonLink secondaryButton" href="/results">View my results</a><button onClick={()=>{setStep(3);setOutcome(null)}}>Edit before lock</button></div></section>}
+    {outcome&&step!==5&&<div className={`stateMessage ${outcome.state}`} role="status"><strong>{outcome.title}</strong><p>{outcome.message}</p></div>}
+  </section></main>;
 }
