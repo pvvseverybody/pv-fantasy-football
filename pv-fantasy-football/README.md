@@ -59,3 +59,14 @@ Run `npm run certify:sidearm-history` to inspect the allowlisted official histor
 `npm run certify:l3-rice` runs the read-only 2025 Prairie View at Rice identity, normalization, official-book reconciliation, and fantasy-score dry run. The 2026 identity review artifacts are `reports/pv-2026-canonical-identity-proposal.csv` and `reports/pv-2026-identity-review.md`; they are proposals only and do not update `Players`.
 
 `npm run certify:pv-roster` retrieves the current official PV roster and compares it with the captured fall-camp baseline, the production `Players` registry (live read-only when credentials are present, otherwise the labeled captured production snapshot), and prior provider mapping proposals. It preserves timestamped raw roster evidence and regenerates a manual-approval migration proposal. During fall camp the result is always classified `PROVISIONAL_FALL_CAMP`; missing jerseys are expected, and no player is automatically created, changed, deactivated, or assigned a reused PV ID.
+
+## Internal game-day operations
+
+`/admin` is a read-only operations status page. `/api/admin/readiness?game_id=<GAME_ID>` returns the same authoritative assessment as a machine-readable `READY`, `HOLD`, or `BLOCKED` object. Both paths are protected by server middleware and require these server-only environment variables:
+
+- `PV_ADMIN_USERNAME`
+- `PV_ADMIN_PASSWORD` (use a long, unique secret)
+
+If either variable is missing, both paths fail closed with HTTP 503. Invalid credentials receive HTTP 401. Use HTTPS in every deployed environment, store these values only in the hosting platform's encrypted server environment, and never create `NEXT_PUBLIC_` copies. Rotate the credentials if they are shared or exposed.
+
+The status surface reads existing `Games`, feed/runner, ingestion QA, lineup/version, scoring, reconciliation, invariant, and publication-control tables. It has no production mutation actions. A provider final signal is never sufficient for `READY`: official-final verification, normalized-stat completeness, identity resolution, exactly eight accepted scoring picks, score reconciliation, passing gates/invariants, `READY_TO_LOCK`, and explicit `PublishControl` release are also required.
