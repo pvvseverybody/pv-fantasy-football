@@ -74,6 +74,7 @@ export async function POST(request) {
       code:promoted.duplicate ? 'LINEUP_ALREADY_ACCEPTED' : 'LINEUP_ACCEPTED',
       message:promoted.duplicate ? 'This lineup was already accepted.' : 'Lineup submitted and accepted.',
       game_id:gameId,
+      submitted_at:saved.submittedAt || submittedAt.toISOString(),
       submission_id:saved.submissionId,
       version:promoted.version
     }, {status:promoted.duplicate ? 200 : 201});

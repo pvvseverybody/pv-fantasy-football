@@ -1,12 +1,12 @@
-# PV vs Everybody — Game-day operator runbook
+# PV vs Everybody — W0 Tarleton launch and game-day runbook
 
 This runbook is for a non-developer. Use the protected Game-day Operations page. Do not edit score tables or publish because a game merely looks final.
 
-## Before game day
+## PRE-LAUNCH
 
-**You should see:** the correct opponent and kickoff; lineup status OPEN only for the intended game; feed configured but not live; scoring not calculated; publication HOLD.
+**You should see:** System Readiness is at least READY FOR BETA; configuration and workbook schema are configured/compatible; Season Launch Preflight has no BLOCKED diagnostics; W0 Tarleton is the only OPEN game; W1 and later are PENDING; publication is HOLD.
 
-**Do:** confirm the official schedule, roster, participant list, eight-slot eligibility, provider event identity, and admin login. Submit one approved staging/launch-tester lineup and verify its confirmation. Keep publication on HOLD.
+**Do:** verify the protected admin login and `/api/admin/system-readiness`; confirm the official schedule, final approved roster status, participant registration/email delivery, eight-slot eligibility, provider event identity, and service-account read access. Complete the approved staging beta journey and verify raw plus authoritative lineup records. Keep publication on HOLD.
 
 **If not:** stop. Wrong opponent, kickoff, event ID, or roster identity must be corrected and rechecked before accepting entries. If admin is unavailable, verify server environment and service-account access.
 
@@ -26,7 +26,7 @@ This runbook is for a non-developer. Use the protected Game-day Operations page.
 
 **If not:** do not manually alter picks. Use the authoritative submission/version records to determine the latest accepted pre-kickoff version. Any participant with fewer or more than eight scoring picks is blocked from scoring until repaired and reconciled.
 
-## During game
+## GAME DAY — during play
 
 **You should see:** LIVE game state; fresh snapshots at the certified interval; feed healthy; ingestion times advancing; normalized player count growing/stable; provisional scoring only; publication HOLD.
 
@@ -34,7 +34,7 @@ This runbook is for a non-developer. Use the protected Game-day Operations page.
 
 **If not:** stale feed/provider unavailable → retain the last good snapshot and allow certified retries. Identity ambiguity or game mismatch → stop scoring for affected data and resolve against official evidence. Missing/duplicate stats or score mismatch → keep publication blocked.
 
-## At apparent final
+## POSTGAME — apparent final
 
 **You should see:** provider final observed repeatedly; feed runner performs continued verification; official final is still NOT VERIFIED until the official artifact is available; publication HOLD.
 
@@ -42,7 +42,7 @@ This runbook is for a non-developer. Use the protected Game-day Operations page.
 
 **If not:** if the provider returns to live or numbers change, resume verification and treat the earlier final as false/apparent. Never publish from a single final signal.
 
-## Before publishing final scores
+## POSTGAME — before publishing final scores
 
 **You should see:** official final VERIFIED; no unmatched/ambiguous players; complete normalized stats including required defensive fallback; exactly eight accepted scoring picks per participant; player, lineup, weekly, and leaderboard totals reconciled; reconciliation PASS and READY_TO_LOCK; no active blocker.
 
@@ -57,3 +57,7 @@ This runbook is for a non-developer. Use the protected Game-day Operations page.
 **Do:** spot-check at least two participants, including a shared player if present. Save the certification/reconciliation evidence and record publication time. Keep raw snapshots and audit tables unchanged.
 
 **If not:** freeze/return publication to HOLD through the existing authorized control process, preserve evidence, and investigate. Do not patch public scores directly or create a second source of truth.
+
+## EMERGENCY HOLD
+
+Publication must remain frozen for any unavailable workbook/control state, failed schema check, game/event identity mismatch, stale or unavailable feed without certified recovery, unresolved player identity, missing or duplicate normalized stats, unavailable authoritative FF/FR/fumble-return evidence, anything other than exactly eight unique scoring picks, superseded/rejected/late lineup leakage, player/lineup/weekly total mismatch, failed WriterGate/ScoringGate/ScoringE2E/invariant, unverified official final, reconciliation discrepancy, or publication control that is not explicitly approved. Preserve evidence, stop the affected pipeline action, and follow the diagnostic’s recommended action; never repair public totals directly.

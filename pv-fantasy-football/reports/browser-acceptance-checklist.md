@@ -70,7 +70,7 @@ Use this checklist against a preview/staging deployment connected to an isolated
 - [ ] Weekly standings sort descending and ranks match `WeeklyScores` for the selected week.
 - [ ] Season standings match `Leaderboard` totals and ordering.
 - [ ] Public status is only PREGAME, LIVE • PROVISIONAL, FINAL • VERIFYING STATS, or FINAL • OFFICIAL.
-- [ ] Personal results reject an unknown email without echoing the address.
+- [ ] Personal results require the verified participant session and cannot be switched by adding an email or Participant ID to the request.
 - [ ] While entry is OPEN, personal results do not reveal accepted picks.
 - [ ] After lock, personal results show only the accepted scoring-version eight, with player and lineup totals matching authoritative scores.
 - [ ] Superseded, rejected, incomplete, and late versions never appear.
@@ -84,6 +84,8 @@ Use this checklist against a preview/staging deployment connected to an isolated
 - [ ] Valid credentials load the selected-game status surface over HTTPS.
 - [ ] Admin contains no score, publish, lineup, or data mutation button.
 - [ ] `/api/admin/readiness?game_id=<valid>` returns READY, HOLD, or BLOCKED with reasons.
+- [ ] `/api/admin/preflight` reports season-wide schedule, identity, roster, and entry-window findings without exposing workbook data.
+- [ ] `/api/admin/system-readiness` reports configuration, workbook/schema, authentication, scoring, preflight, game, and publication states without exposing configuration values.
 - [ ] Final game state alone remains HOLD/BLOCKED until all required reconciliation/publication conditions pass.
 
 ## Error and offline acceptance

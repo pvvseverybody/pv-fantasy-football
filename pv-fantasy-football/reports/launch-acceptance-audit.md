@@ -1,31 +1,31 @@
 # PV Fantasy Football 1.0 — Pre-deployment acceptance audit
 
-Audit date: 2026-08-17 (America/Chicago)  
+Audit date: 2026-08-19 (America/Chicago)
 Scope: participant application, protected operations surface, scoring pipeline, repository security, and production workbook.  
 Production workbook access during this audit was read-only.
 
 ## Executive decision
 
-The application compiles and the certified lineup/scoring invariants remain intact. The public navigation and every declared route resolve. Participant write authentication has been closed with passwordless email verification and an opaque server-validated session. Two production-data corrections remain: replacement of demo-only participant data with approved real participants and correction of game identity drift across production control tables.
+The application compiles and the certified lineup/scoring invariants remain intact. The public navigation and every declared route resolve. Passwordless authentication, secure self-registration, session-bound lineup writes, and session-bound personal results are implemented. The production game/control identity correction has been completed: W0 is the sole OPEN entry window, W1–W11 and postseason are PENDING, and the production control associations now follow the authoritative `Games` IDs. The new protected season-launch preflight fails closed on schedule/control drift, active demo identities, participant/player collisions, missing eligible players, and other launch-integrity conditions.
 
-The official 2026 schedule confirms W0 is Prairie View at Tarleton State on August 29 at 8:00 PM CT. The `Games` table matches the official schedule for the sampled rows. The current `FeedControl` and `Reconciliation` rows do not consistently match those `Game ID`/opponent pairs. Source: https://pvpanthers.com/sports/football/schedule/2026
+The official 2026 schedule confirms W0 is Prairie View at Tarleton State on August 29 at 8:00 PM CT. `Games` remains the authoritative schedule reference. Source: https://pvpanthers.com/sports/football/schedule/2026
 
 ## Critical workflow trace
 
 ### Participant
 
-1. `/` loads public game information from `GET /api/game-hub` and stores the entered normalized email in browser session storage.
+1. `/` loads public game information from `GET /api/game-hub` and offers secure registration or returning-participant sign-in. Participant identity is not stored in client-accessible session storage.
 2. `/lineup` loads active eligible players from `GET /api/players`, loads games, and moves through Identify → Game → Lineup → Review.
 3. The UI prevents duplicate choices and shows only slot-eligible players. The server independently repeats completeness, uniqueness, eligibility, active-player, open-game, and kickoff checks.
 4. `POST /api/lineup` is the only public production write. It saves the raw ledger record, promotes through the authoritative versioned model, then reports success only after authoritative acceptance.
-5. `/results` uses read-only `POST /api/results`; it does not return emails or participant IDs and hides picks while entries remain open.
+5. `/results` uses authenticated read-only `POST /api/results`; participant identity comes exclusively from the verified server session. It does not return emails or participant IDs and hides picks while entries remain open.
 6. `/leaderboard` uses `GET /api/leaderboard`; demo/test records are filtered and public status is reduced to participant-safe labels.
 
 Result: route and data flow are coherent. Registered email alone no longer authorizes writes; the participant must verify a short-lived code delivered to the registered inbox.
 
 ### PV Fantasy administrator
 
-1. `/admin` and `/api/admin/readiness` are protected by server middleware and HTTP Basic authentication.
+1. `/admin`, `/api/admin/readiness`, and `/api/admin/preflight` are protected by server middleware and HTTP Basic authentication.
 2. Missing admin configuration fails closed with HTTP 503; invalid credentials return HTTP 401.
 3. The page is read-only and derives status from the existing workbook controls. It has no score, publish, lineup, or data mutation action.
 4. `READY` requires official final, passing reconciliation, `READY_TO_LOCK`, valid scoring/lineup invariants, and explicit publication release.
@@ -55,10 +55,11 @@ Result: certified path remains intact. The application pipeline cannot safely ru
 | `/admin` | Protected | PASS | Read-only operations surface |
 | `/api/game-hub` | Public read | PASS | No provider/internal fields returned |
 | `/api/players` | Public read | PASS | No private identity fields returned |
-| `/api/lineup` | Public write | CONDITIONAL | Integrity checks pass; participant authentication unresolved |
-| `/api/results` | Public read via POST | PASS | Email not echoed; open-game picks hidden |
+| `/api/lineup` | Authenticated write | PASS | Session identity only; integrity checks remain authoritative |
+| `/api/results` | Authenticated read via POST | PASS | Session identity only; email/Participant ID not accepted or returned; open-game picks hidden |
 | `/api/leaderboard` | Public read | PASS | Demo/test participants excluded |
 | `/api/admin/readiness` | Protected read | PASS | Fails closed |
+| `/api/admin/preflight` | Protected read | PASS | Season-wide schedule, identity, roster, and entry-window checks; fails closed |
 | `/api/scoring` | Protected write | PASS | Bearer secret required |
 
 No dead public navigation targets were found. No public link points to the admin surface.
@@ -66,14 +67,14 @@ No dead public navigation targets were found. No public link points to the admin
 ## Defects and findings
 
 1. **Participant write authentication — resolved.** A generic, enumeration-resistant login request sends a six-digit code to a registered inbox. The code is HMAC-hashed, expires after ten minutes, and is limited to five attempts. Successful verification creates an opaque seven-day session whose hash and status are stored in the existing `ParticipantSession` ledger; the browser receives only a Secure, HttpOnly, SameSite=Strict cookie. Lineup/results identity is derived from the active verified session.
-2. **Production participants — unresolved launch blocker.** The sampled production `Participants` table contains only `DEMO-001`, explicitly marked for deletion/replacement before launch. Public APIs correctly suppress it, leaving no real participant able to submit.
-3. **Game/control identity drift — unresolved launch blocker.** `Games` correctly starts with W0 Tarleton State, W1 Texas Southern, W2 Baylor, W3 SFA, W4 Grambling State. Sampled control rows include `2026-W2` paired with Texas Southern, `2026-W4` paired with SFA, and `Reconciliation 2026-W1` paired with Tarleton State. Correct and revalidate all IDs, opponents, provider event IDs, and kickoff times before enabling runners or scoring.
+2. **Participant provisioning — resolved in code; production configuration remains.** Verified public self-registration creates permanent participant identities only after successful email-code verification and uniqueness checks. Active demo/test identities remain a preflight blocker and must not be present at launch.
+3. **Game/control identity drift — corrected.** Production associations were reconciled to `Games`: Tarleton is `2026-W0`, subsequent regular-season opponents map through `2026-W11`, and `CERT-AUG27` remains isolated. The season preflight now detects regression.
 4. **Countdown timezone — fixed.** The client previously interpreted Central Time text in the device timezone. It now converts explicit `America/Chicago` wall time and has daylight/standard-time tests.
-5. **Entry-window policy — requires launch decision.** Sampled `Games` rows W0–W4 are all `OPEN`. Confirm whether advance entry for multiple weeks is intended. Close every game that should not accept submissions.
+5. **Entry-window policy — resolved.** `2026-W0` is OPEN; W1–W11 and postseason are PENDING. Multiple simultaneous OPEN games now produce a season-preflight HOLD.
 6. **Roster remains provisional — expected.** `Players` is populated from the official roster but remains `PROVISIONAL_FALL_CAMP`; blank jerseys are intentionally omitted. Final-roster reconciliation and manual migration are still required before the first live game.
 7. **Live provider certification incomplete — expected pre-live condition.** Current control rows are armed/not running. Actual PV live behavior, final verification, and defensive FF/FR/fumble-return fallback remain live-window dependencies.
-8. **Home offline feedback is minimal.** The lineup page provides an explicit backend-load error; the home game card can be absent without a visible error. This is non-blocking because entry continues to a fail-safe lineup load error.
-9. **Email lookup can be enumerated.** `/api/results` distinguishes unknown participants. It exposes no email/participant ID and hides pre-lock picks, but rate limiting and authenticated participant sessions should be added with the write-auth resolution.
+8. **Home schedule failure feedback — resolved.** A failed authoritative schedule request now produces an explicit fail-safe message instead of leaving a perpetual loading card.
+9. **Personal-results enumeration — resolved.** `/api/results` requires a valid participant session and derives identity server-side. Modified email or Participant ID request data cannot select another participant.
 
 ## Authoritative production environment variables
 
@@ -106,25 +107,34 @@ The repository now includes a pinned pnpm version, lockfile, and patched `sharp`
 - **Leaderboard:** `WeeklyScores` validates exactly eight picks; `Leaderboard` excludes demo/test identities from launch data; public API remains empty rather than inventing results.
 - **Publication controls:** writer/scoring/invariant checks pass, reconciliation waits before final, and official release stays HOLD until the operator completes the final checklist.
 
-## Launch classification
+## Current launch readiness by dependency
 
-### BLOCKS LAUNCH
+### A. CODE COMPLETE
 
-- Provision approved real participants and remove/deactivate the demo participant before opening public entry.
-- Correct and certify every production game identity across `Games`, `FeedControl`, `RunnerState`, and `Reconciliation`; confirm which games should actually be `OPEN`.
+- Passwordless registration/login, opaque sessions, session-bound lineup writes, and session-bound personal results.
+- Certified lineup persistence, authoritative version promotion, scoring, reconciliation, and publication safeguards.
+- Protected game readiness, Season Launch Preflight, and System Readiness APIs/dashboard.
+- Fail-closed production configuration status that never returns configuration values.
+- Read-only critical-tab connectivity and schema-drift validation, including strict write-table order and duplicate-header detection.
+- Participant failure states, explicit schedule/player-pool failures, and full eight-player accepted-lineup confirmation.
 
-### MUST VERIFY BEFORE FIRST LIVE GAME
+### B. REQUIRES PRODUCTION CONFIGURATION
 
-- Run final-roster reconciliation, approve the migration, and verify provider-to-PV mappings without reusing permanent PV IDs.
-- Complete W0 live-provider mapping/certification, including retry/final behavior and official final-stat evidence.
-- Prove or supply the authoritative FF/FR/fumble-return-TD fallback and keep publication blocked if any required field is unavailable.
-- Exercise the complete browser checklist with an approved real tester or an isolated staging workbook copy.
-- Verify production environment variables, HTTPS, service-account workbook access, scoring secret, and admin credentials.
-- Confirm `PublishControl` begins on HOLD and the admin readiness endpoint is not `READY` before final reconciliation.
+- Configure all nine required server variables, HTTPS, verified Resend sender, and service-account workbook access.
+- Run protected System Readiness against production and resolve configuration, connectivity, schema, preflight, demo/test identity, or publication-control findings.
+- Confirm production `PublishControl` begins on HOLD. No code result substitutes for operator approval.
 
-### CAN WAIT UNTIL AFTER 1.0
+### C. REQUIRES OFFICIAL FINAL ROSTER
 
-- Richer home-page offline messaging beyond the current fail-safe lineup error.
-- Participant self-service account management and profile editing.
-- Enhanced admin alert delivery, dashboards, and host-level observability.
-- Additional visual polish, photos, animations, and nonessential analytics.
+- Run roster reconciliation, approve the migration manually, and verify provider mappings while preserving permanent PV Player IDs.
+- Supply or approve any still-missing official visual assets; no unofficial replacement is permitted.
+
+### D. REQUIRES LIVE GAME WINDOW
+
+- Complete the scheduled live transport observations and W0 SIDEARM certification.
+- Verify official final statistics and the authoritative FF/FR/fumble-return-TD fallback; publication remains blocked when required evidence is unavailable.
+
+### E. REQUIRES HUMAN/BETA ACCEPTANCE
+
+- Complete the browser/device checklist in isolated staging with approved testers, including registration email delivery, replacement, identical retry, lock, results, leaderboard, and admin review.
+- Record beta sign-off. System Readiness intentionally caps at READY FOR BETA until human approval is supplied to the evaluator; deployment/public opening still requires explicit authorization.

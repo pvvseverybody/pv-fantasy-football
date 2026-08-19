@@ -4,6 +4,8 @@ import {evaluateGameDayReadiness} from './game-day-readiness.mjs';
 
 const RANGES = {
   Games: "'Games'!A3:M100",
+  Participants: "'Participants'!A3:K1000",
+  Players: "'Players'!A3:H1000",
   FeedControl: "'FeedControl'!A3:N200",
   RunnerState: "'RunnerState'!A3:N200",
   FeedSnapshots: "'FeedSnapshots'!A3:L2000",

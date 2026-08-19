@@ -77,8 +77,8 @@ export async function saveLineupSubmission({email, gameId, picks, submittedAt = 
     const rows = await readSheetRange(`${sheet}!A3:L`);
     assertSchema(rows);
 
-    const duplicate = rows.slice(1).some(row => String(row[0] || '').trim() === id);
-    if (duplicate) return {submissionId: id, duplicate: true};
+    const existing = rows.slice(1).find(row => String(row[0] || '').trim() === id);
+    if (existing) return {submissionId: id, duplicate: true, submittedAt: String(existing[1] || '')};
 
     const row = [
       id,
@@ -92,6 +92,7 @@ export async function saveLineupSubmission({email, gameId, picks, submittedAt = 
     return {
       submissionId: id,
       duplicate: false,
+      submittedAt: submittedAt.toISOString(),
       updatedRange: result.updates?.updatedRange || null,
     };
   });

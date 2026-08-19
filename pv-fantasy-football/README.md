@@ -30,7 +30,7 @@ After the raw write succeeds, the server resolves an existing active, verified p
 - upsert the rebuildable `Lineups` projection;
 - upsert `ActiveLineups` to the newly accepted version.
 
-The API reports acceptance only after post-write invariant checks pass. The current web request has no participant display-name field, so unknown emails are not auto-created; they fail the writer identity gate instead.
+The API reports acceptance only after post-write invariant checks pass. Lineup requests never create identities; new participants must first complete the separate verified self-registration flow.
 
 ## Scoring pipeline
 
@@ -80,6 +80,10 @@ Participant authentication uses the existing `ParticipantSession` A3:K schema an
 Public self-registration uses the same passwordless challenge/session ledger. A registration is held only inside the HMAC-protected challenge metadata until its email code is verified. Finalization writes an inactive candidate to the existing `Participants` A:K schema, rechecks normalized-email, case-insensitive Display Name, and generated Participant ID uniqueness, then activates it with `Identity Status=VERIFIED` and `Duplicate Flag=CLEAR`. `Display Name` is the public Fantasy Team Name; structured `Notes` retains the formal first/last name, terms version/timestamp, and registration provenance. No workbook schema change is required. Email/team uniqueness is fail-closed and strongly guarded, but Google Sheets does not provide a cross-instance conditional transaction, so strict case-insensitive team-name uniqueness must be monitored operationally; conflicting candidates remain inactive for review.
 
 The registration and login routes also apply bounded in-process IP throttles, while the durable challenge ledger enforces a one-minute per-email resend cooldown, ten-minute code expiry, and five-attempt lockout. For internet-scale abuse protection, configure a platform/WAF rate limit in front of `/api/auth/register`, `/api/auth/request`, and `/api/auth/verify`; no paid rate-limit service is required for the controlled 1.0 participant pool.
+
+The protected read-only operations surface includes a season-wide launch preflight. `/api/admin/preflight` and the corresponding `/admin` summary reuse the existing HTTP Basic middleware protection and authoritative workbook reads. The preflight returns `READY`, `HOLD`, or `BLOCKED` and checks schedule/control identity, entry-window policy, participant collisions/demo records, roster availability/provisional status, and provider-event ownership. Missing workbook access fails closed; the endpoint never mutates Sheets.
+
+`/api/admin/system-readiness` combines value-free production configuration status, read-only workbook connectivity and critical header compatibility, season preflight, selected-game readiness, participant-auth/scoring configuration, and publication state. It returns no environment values. The status intentionally stops at `READY FOR BETA` until human beta acceptance; production opening and deployment remain explicit operator decisions. Missing local credentials report `CONFIGURATION REQUIRED` without breaking the application build.
 
 ## Launch acceptance
 
