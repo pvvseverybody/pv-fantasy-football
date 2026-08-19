@@ -21,7 +21,11 @@ export const OFFICIAL_ASSET_PATHS = Object.freeze({
 
 // Add a key only after Lionel approves the exact local file. An expected path
 // alone never authorizes a logo for display.
-export const APPROVED_OFFICIAL_ASSET_KEYS = Object.freeze([]);
+export const APPROVED_OFFICIAL_ASSET_KEYS = Object.freeze([
+  'pv-fantasy',
+  'pvamu',
+  'opponent:Tarleton State',
+]);
 
 const OPPONENT_ALIASES = Object.freeze({
   SFA: 'Stephen F. Austin',

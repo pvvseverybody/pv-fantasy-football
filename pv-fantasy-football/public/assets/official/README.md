@@ -21,6 +21,6 @@ Required files:
 - `opponents/swac-championship.png`
 - `opponents/celebration-bowl.png`
 
-Transparent PNG is the initial approved interchange format. Keep each original aspect ratio and transparent padding. The UI renders `ASSET REQUIRED` when a file is absent or invalid.
+PNG is the approved interchange format. Keep each original aspect ratio and transparent padding. The UI renders `ASSET REQUIRED` when a file is absent or invalid.
 
 After Lionel approves a supplied file, add its exact key to `APPROVED_OFFICIAL_ASSET_KEYS` in `lib/official-assets.mjs`. Merely placing a file at an expected path does not approve it.

@@ -38,7 +38,9 @@ test('official assets resolve by authoritative opponent without altering lineup 
   assert.equal(canonicalOpponent('Stephen F Austin'),'Stephen F. Austin');
   assert.equal(canonicalOpponent('UAPB'),'Arkansas-Pine Bluff');
   assert.equal(officialAsset('opponent','Tarleton State').src,'/assets/official/opponents/tarleton-state.png');
-  assert.equal(officialAsset('opponent','Tarleton State').approved,false);
+  assert.equal(officialAsset('opponent','Tarleton State').approved,true);
   assert.equal(officialAsset('opponent','Unknown Opponent').src,'');
   assert.equal(officialAsset('pvamu').src,'/assets/official/prairie-view-am-logo.png');
+  assert.equal(officialAsset('pvamu').approved,true);
+  assert.equal(officialAsset('pv-fantasy').approved,true);
 });
