@@ -93,6 +93,8 @@ Run `pnpm certify:w0-launch` for the isolated W0 Tarleton launch simulation. It 
 
 Vercel must use this directory as the project root, `pnpm install --frozen-lockfile`, and `pnpm build`; the application requires a Node server runtime and is not a static export. Set `PV_FANTASY_ENV=staging`, `PV_FANTASY_RELEASE_MODE=BETA`, and pin `BACKEND_SPREADSHEET_ID` to the same isolated value as `PV_FANTASY_STAGING_SPREADSHEET_ID`. Staging rejects `PUBLIC` mode and, when the production workbook marker is supplied, rejects an accidental production-workbook match. `/api/health` returns only safe process/configuration/version categories and performs no Sheets read. Full readiness and public-opening checks remain protected admin routes.
 
+After a staging URL and its server-only configuration exist, run `pnpm certify:staging`. The command requires `PV_FANTASY_STAGING_URL`, the staging workbook pin, and staging admin credentials. It performs read-only HTTP checks of health, authentication availability, workbook/schema preflight, public-opening status, and `2026-W0` identity. It refuses production or `PUBLIC` configuration and never writes workbook data.
+
 Run `pnpm certify:w0-dry-run` before creating a preview deployment. It runs the complete tests, optimized build, W0 simulation, dangerous-state/cutoff/schema checks, and a repository credential-file/private-key scan; any failure exits non-zero. See `reports/staging-deployment-readiness.md` and `reports/beta-acceptance-package.md` for the environment matrix, serverless/concurrency findings, staging steps, and tester checklist.
 
 ## Launch acceptance
