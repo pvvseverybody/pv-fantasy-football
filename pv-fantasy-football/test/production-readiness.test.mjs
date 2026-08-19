@@ -48,13 +48,13 @@ test('workbook validation reports any incompatible critical tab',()=>{
   assert.equal(validateWorkbookSchemas(fixture).status,'INCOMPATIBLE');
 });
 
-const readyInput=()=>({configuration:evaluateProductionConfig(validEnvironment()),connectivity:{status:'CONNECTED',schema:{status:'COMPATIBLE'}},preflight:{status:'READY'},gameReadiness:{readiness:'HOLD',publication:{status:'HOLD'}}});
+const readyInput=()=>({configuration:evaluateProductionConfig(validEnvironment()),connectivity:{status:'CONNECTED',schema:{status:'COMPATIBLE'}},preflight:{status:'READY'},gameReadiness:{readiness:'HOLD',publication:{status:'HOLD'}},releaseMode:{mode:'BETA'},betaAcceptance:{status:'PASS'}});
 
 test('system readiness requires human beta acceptance before public entry',()=>{
   const result=evaluateSystemReadiness(readyInput());
   assert.equal(result.status,'READY FOR BETA');
   assert.equal(result.safe_to_open_to_participants,false);
-  assert.equal(evaluateSystemReadiness({...readyInput(),betaApproved:true}).status,'READY FOR PUBLIC ENTRY');
+  assert.equal(evaluateSystemReadiness({...readyInput(),releaseMode:{mode:'PUBLIC'}}).status,'READY FOR PUBLIC ENTRY');
 });
 
 test('system readiness distinguishes configuration, schema, and preseason holds',()=>{

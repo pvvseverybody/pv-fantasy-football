@@ -3,6 +3,7 @@ import {readSheetRange} from '../../../lib/google-sheets';
 import {participantResults,rowsToRecords} from '../../../lib/participant-experience.mjs';
 import {AUTH_COOKIE,authenticatedParticipantEmail,cookieValue,requiredAuthConfig,secureRequest} from '../../../lib/participant-auth.mjs';
 import {participantAuthService} from '../../../lib/participant-auth-service';
+import {logServerFailure} from '../../../lib/safe-server-log.mjs';
 
 export const dynamic='force-dynamic';
 export async function POST(request){
@@ -16,5 +17,5 @@ export async function POST(request){
     const result=participantResults({participants:rowsToRecords(participants),active:rowsToRecords(active),picks:rowsToRecords(picks),scores:rowsToRecords(scores),weekly:rowsToRecords(weekly),games:rowsToRecords(games),players:rowsToRecords(players),releaseStatus:release?.Status||''},authenticatedParticipantEmail(authenticated));
     if(!result)return NextResponse.json({found:false,code:'UNAUTHENTICATED',message:'Sign in to view your results.'},{status:401});
     return NextResponse.json({found:true,...result},{headers:{'Cache-Control':'no-store'}});
-  }catch(error){console.error('POST /api/results failed:',error);return NextResponse.json({found:false,code:error.code==='AUTH_NOT_CONFIGURED'?error.code:'BACKEND_ERROR',message:'Results are temporarily unavailable.'},{status:error.code==='AUTH_NOT_CONFIGURED'?503:500});}
+  }catch(error){logServerFailure('results',error);return NextResponse.json({found:false,code:error.code==='AUTH_NOT_CONFIGURED'?error.code:'BACKEND_ERROR',message:'Results are temporarily unavailable.'},{status:error.code==='AUTH_NOT_CONFIGURED'?503:500});}
 }

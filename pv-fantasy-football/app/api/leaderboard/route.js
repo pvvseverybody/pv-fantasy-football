@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {readSheetRange} from '../../../lib/google-sheets';
 import {publicLeaderboard,rowsToRecords} from '../../../lib/participant-experience.mjs';
+import {logServerFailure} from '../../../lib/safe-server-log.mjs';
 
 export const dynamic='force-dynamic';
 export async function GET(request){
@@ -10,5 +11,5 @@ export async function GET(request){
     const release=rowsToRecords(publish).find(row=>String(row.Control).toUpperCase()==='OFFICIAL RELEASE');
     const result=publicLeaderboard({weekly:rowsToRecords(weekly),leaderboard:rowsToRecords(leaderboard),games:rowsToRecords(games),releaseStatus:release?.Status||''},week);
     return NextResponse.json({...result,status:result.weekly.length||result.cumulative.length?'available':'awaiting_results'},{headers:{'Cache-Control':'no-store'}});
-  }catch(error){console.error('GET /api/leaderboard failed:',error);return NextResponse.json({weekly:[],cumulative:[],status:'backend_error',message:'Standings are temporarily unavailable.'},{status:500});}
+  }catch(error){logServerFailure('leaderboard',error);return NextResponse.json({weekly:[],cumulative:[],status:'backend_error',message:'Standings are temporarily unavailable.'},{status:500});}
 }

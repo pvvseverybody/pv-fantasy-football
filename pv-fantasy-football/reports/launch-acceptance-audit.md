@@ -114,6 +114,11 @@ The repository now includes a pinned pnpm version, lockfile, and patched `sharp`
 - Passwordless registration/login, opaque sessions, session-bound lineup writes, and session-bound personal results.
 - Certified lineup persistence, authoritative version promotion, scoring, reconciliation, and publication safeguards.
 - Protected game readiness, Season Launch Preflight, and System Readiness APIs/dashboard.
+- Server-controlled DEVELOPMENT/BETA/PUBLIC release mode that defaults to DEVELOPMENT and requires explicit deployment authorization for PUBLIC.
+- Read-only beta acceptance ledger covering registration, login, lineup/version/lock, results, leaderboard, responsive devices, accessibility, and backend failures.
+- Isolated W0 Tarleton launch simulation proving pre-lock replacement, duplicate idempotency, kickoff rejection, provisional/final scoring, publication HOLD, fallback, reconciliation, and final release.
+- Session-bound accepted-lineup recovery without exposing Participant IDs or Submission IDs.
+- Sanitized server failure logging and regression coverage preventing upstream messages, stacks, workbook IDs, credentials, emails, and tokens from entering logs.
 - Fail-closed production configuration status that never returns configuration values.
 - Read-only critical-tab connectivity and schema-drift validation, including strict write-table order and duplicate-header detection.
 - Participant failure states, explicit schedule/player-pool failures, and full eight-player accepted-lineup confirmation.

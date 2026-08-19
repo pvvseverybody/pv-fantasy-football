@@ -1,6 +1,6 @@
 const upper=value=>String(value??'').trim().toUpperCase();
 
-export function evaluateSystemReadiness({configuration,connectivity,preflight,gameReadiness,betaApproved=false}={}){
+export function evaluateSystemReadiness({configuration,connectivity,preflight,gameReadiness,releaseMode={mode:'DEVELOPMENT'},betaAcceptance={status:'PENDING'}}={}){
   const reasons=[];
   if(configuration?.status!=='CONFIGURED')reasons.push('PRODUCTION_CONFIGURATION_REQUIRED');
   if(connectivity?.status==='UNAVAILABLE')reasons.push('WORKBOOK_UNAVAILABLE');
@@ -14,8 +14,10 @@ export function evaluateSystemReadiness({configuration,connectivity,preflight,ga
   if(configuration?.status!=='CONFIGURED')status='CONFIGURATION REQUIRED';
   else if(hardBlocked)status='BLOCKED';
   else if(preflight?.status!=='READY')status='PRESEASON HOLD';
-  else if(!betaApproved)status='READY FOR BETA';
-  else status='READY FOR PUBLIC ENTRY';
+  else if(releaseMode.mode==='DEVELOPMENT')status='PRESEASON HOLD';
+  else if(releaseMode.mode==='BETA'||betaAcceptance.status!=='PASS')status='READY FOR BETA';
+  else if(releaseMode.mode==='PUBLIC'&&betaAcceptance.status==='PASS')status='READY FOR PUBLIC ENTRY';
+  else status='READY FOR BETA';
   return{
     status,
     safe_to_open_to_participants:status==='READY FOR PUBLIC ENTRY',
@@ -27,6 +29,8 @@ export function evaluateSystemReadiness({configuration,connectivity,preflight,ga
     season_preflight:preflight?.status||'BLOCKED',
     game_readiness:gameReadiness?.readiness||'BLOCKED',
     publication,
+    release_mode:releaseMode.mode,
+    beta_acceptance:betaAcceptance.status,
     note:status==='READY FOR BETA'?'Code-verifiable prerequisites pass. Human beta acceptance is still required before public entry.':undefined,
   };
 }

@@ -1,6 +1,7 @@
 import {createHash, timingSafeEqual} from 'node:crypto';
 import {NextResponse} from 'next/server';
 import {scoreGame} from '../../../lib/scoring-pipeline';
+import {logServerFailure} from '../../../lib/safe-server-log.mjs';
 
 function authorized(request) {
   const expected = process.env.SCORING_PIPELINE_SECRET;
@@ -20,7 +21,7 @@ export async function POST(request) {
     const result = await scoreGame(body.game_id);
     return NextResponse.json({scored:true,...result});
   } catch (error) {
-    console.error('POST /api/scoring failed:', error);
+    logServerFailure('scoring',error);
     const review = ['SCORING_INPUT_REVIEW_REQUIRED','MISSING_PLAYER_STAT_LINE'].includes(error.code);
     return NextResponse.json({
       scored:false,

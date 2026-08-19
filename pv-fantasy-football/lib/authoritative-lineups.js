@@ -4,6 +4,8 @@ import {
   readSheetRange,
 } from './google-sheets';
 import {LINEUP_SLOTS} from './lineup-submissions';
+import {dateToSheetsSerial} from './lineup-deadline.mjs';
+export {dateToSheetsSerial} from './lineup-deadline.mjs';
 
 const AUTHORITATIVE_SCHEMAS = {
   Participants: [
@@ -132,21 +134,6 @@ async function withWriterGate(key, work) {
     release();
     if (writerGates.get(key) === current) writerGates.delete(key);
   }
-}
-
-export function dateToSheetsSerial(date, timeZone = 'America/Chicago') {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat('en-US', {
-      timeZone,
-      year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
-    }).formatToParts(date).filter(part => part.type !== 'literal').map(part => [part.type, part.value])
-  );
-  const localMilliseconds = Date.UTC(
-    Number(parts.year), Number(parts.month) - 1, Number(parts.day),
-    Number(parts.hour), Number(parts.minute), Number(parts.second)
-  );
-  return localMilliseconds / 86400000 + 25569;
 }
 
 function normalizedEmail(value) {

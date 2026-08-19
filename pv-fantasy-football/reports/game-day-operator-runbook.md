@@ -61,3 +61,18 @@ This runbook is for a non-developer. Use the protected Game-day Operations page.
 ## EMERGENCY HOLD
 
 Publication must remain frozen for any unavailable workbook/control state, failed schema check, game/event identity mismatch, stale or unavailable feed without certified recovery, unresolved player identity, missing or duplicate normalized stats, unavailable authoritative FF/FR/fumble-return evidence, anything other than exactly eight unique scoring picks, superseded/rejected/late lineup leakage, player/lineup/weekly total mismatch, failed WriterGate/ScoringGate/ScoringE2E/invariant, unverified official final, reconciliation discrepancy, or publication control that is not explicitly approved. Preserve evidence, stop the affected pipeline action, and follow the diagnostic’s recommended action; never repair public totals directly.
+
+## Incident playbook
+
+| Incident | Automatic system behavior | Operator check | Continue or freeze |
+|---|---|---|---|
+| Feed goes down | Retain last evidence, retry, report provider unavailable/stale | Official provider, network, timestamps, recovery evidence | Entry may continue before lock; freeze ingestion/scoring/publication |
+| Wrong game detected | Block on identity mismatch | Event ID, teams, kickoff, authoritative Games row | Freeze ingestion/scoring/publication |
+| Player cannot be mapped | Quarantine the identity and block dependent scoring | Official roster, stable provider ID, jersey/name evidence | Freeze affected scoring and publication |
+| Stats change after final | Preserve correction and remove final readiness | Official final artifact and corrected snapshot | Freeze publication or return it to HOLD |
+| Defensive data missing | Report defensive fallback pending | Official FF/FR/fumble-return attribution | Freeze final publication |
+| Scoring total does not reconcile | Report scoring/lineup mismatch | Eight accepted picks, PlayerScores, lineup and weekly sums | Freeze publication |
+| Google Sheets unavailable | Fail APIs/readiness closed without writing | Credentials, sharing, workbook availability, schema | Freeze entry writes, scoring, and publication |
+| Resend unavailable | Return authentication unavailable; create no authenticated session | Sender verification, Resend status, server configuration | Existing sessions may read; freeze new registration/login-dependent entry |
+| Participant cannot log in | Keep identity unverified and lineup writes unauthorized | Generic response, inbox delivery, expiry, throttling; never inspect or reveal codes | Do not bypass authentication |
+| Accidental publication attempt | Readiness remains HOLD/BLOCKED unless every gate passes | Official final, fallback, reconciliation, invariants, explicit control | Freeze publication immediately |

@@ -1,5 +1,6 @@
 import {NextResponse} from 'next/server';
 import {readSheetRange} from '../../../lib/google-sheets';
+import {logServerFailure} from '../../../lib/safe-server-log.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,7 +62,7 @@ export async function GET() {
       {headers: {'Cache-Control': 'no-store, max-age=0'}}
     );
   } catch (error) {
-    console.error('GET /api/players failed:', error);
+    logServerFailure('players',error);
     return NextResponse.json(
       {players: [], status: 'backend_error', message: 'Unable to load the live PV player pool.'},
       {status: 500}

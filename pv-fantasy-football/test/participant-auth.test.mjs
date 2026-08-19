@@ -50,3 +50,12 @@ test('invalid code and expired or invalid session are rejected',async()=>{
 test('session cookie policy is HttpOnly and SameSite strict',()=>{
   const options=cookieOptions(60);assert.equal(options.httpOnly,true);assert.equal(options.sameSite,'strict');assert.equal(options.path,'/');
 });
+
+test('revoked sessions and stale challenges fail closed while another browser can sign in',async()=>{
+  let clock=Date.parse('2026-08-19T12:00:00Z');const repository=memoryRepository([participantA]);const tokens=['challenge-1','token-1','session-1','challenge-2','token-2','session-2','challenge-stale'];
+  const service=createParticipantAuthService({repository,secret:'test-secret',now:()=>clock,sendCode:async()=>{},makeToken:()=>tokens.shift(),makeCode:()=> '123456'});
+  const first=await service.request(participantA.email);const session1=await service.verify(first.challengeId,'123456');
+  await service.logout(session1.token);assert.equal(await service.authenticate(session1.token),null);
+  clock+=61000;const second=await service.request(participantA.email);const session2=await service.verify(second.challengeId,'123456');assert.equal((await service.authenticate(session2.token)).id,participantA.id);
+  clock+=61000;const stale=await service.request(participantA.email);clock+=11*60*1000;assert.equal(await service.verify(stale.challengeId,'123456'),null);
+});

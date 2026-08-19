@@ -85,6 +85,10 @@ The protected read-only operations surface includes a season-wide launch preflig
 
 `/api/admin/system-readiness` combines value-free production configuration status, read-only workbook connectivity and critical header compatibility, season preflight, selected-game readiness, participant-auth/scoring configuration, and publication state. It returns no environment values. The status intentionally stops at `READY FOR BETA` until human beta acceptance; production opening and deployment remain explicit operator decisions. Missing local credentials report `CONFIGURATION REQUIRED` without breaking the application build.
 
+`PV_FANTASY_RELEASE_MODE` is optional server-only configuration with accepted values `DEVELOPMENT`, `BETA`, or `PUBLIC`; missing or invalid values fail closed to `DEVELOPMENT`. Never use a `NEXT_PUBLIC_` copy. `PUBLIC` must be set explicitly by an authorized deployment operator and still cannot produce public-entry readiness unless every beta category passes. `BETA_ACCEPTANCE_JSON` is an optional server-only staging acceptance record; it is read-only, is never written to Sheets, and should contain only category/status/timestamp/evidence references—not participant personal data.
+
+Run `pnpm certify:w0-launch` for the isolated W0 Tarleton launch simulation. It exercises pre-lock replacement, exact retry idempotency, lock and late rejection, incremental/provisional scoring, official-final HOLD, defensive fallback, reconciliation, explicit publication, results eligibility, and leaderboard generation without network or workbook writes.
+
 ## Launch acceptance
 
 - `reports/launch-acceptance-audit.md` is the authoritative pre-deployment audit, environment list, production-data checklist, and launch classification.

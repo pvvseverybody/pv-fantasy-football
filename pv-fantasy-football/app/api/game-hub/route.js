@@ -1,5 +1,6 @@
 import {NextResponse} from 'next/server';
 import {readSheetRange} from '../../../lib/google-sheets';
+import {logServerFailure} from '../../../lib/safe-server-log.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +21,7 @@ export async function GET() {
     }));
     return NextResponse.json({games, status:'live_google_sheets'}, {headers:{'Cache-Control':'no-store'}});
   } catch (error) {
-    console.error(error);
+    logServerFailure('game-hub',error);
     return NextResponse.json({games:[],status:'backend_error'}, {status:500});
   }
 }

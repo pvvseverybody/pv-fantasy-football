@@ -50,7 +50,7 @@ export function rowsToRecords(rows=[]) {
 
 const number = value => Number(value || 0);
 export function participantStatusLabel(game={}, releaseStatus='') {
-  if (String(game['Stats Final?']).toUpperCase() === 'YES') return String(releaseStatus).toUpperCase() === 'PUBLISH' ? 'FINAL • OFFICIAL' : 'FINAL • VERIFYING STATS';
+  if (String(game['Stats Final?']).toUpperCase() === 'YES') return String(releaseStatus).toUpperCase() === 'PUBLISH' ? 'FINAL • OFFICIAL' : String(releaseStatus).toUpperCase()==='HOLD' ? 'FINAL • PUBLICATION HOLD' : 'FINAL • CERTIFICATION PENDING';
   return String(game['Pick Status']).toUpperCase() === 'OPEN' ? 'PREGAME' : 'LIVE • PROVISIONAL';
 }
 

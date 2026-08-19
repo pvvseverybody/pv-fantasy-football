@@ -41,7 +41,8 @@ test('public leaderboard excludes demo data and ranks valid weekly scores',()=>{
 test('participant score labels honor final publication without exposing gates',()=>{
   assert.equal(participantStatusLabel({'Pick Status':'OPEN','Stats Final?':'NO'},'HOLD'),'PREGAME');
   assert.equal(participantStatusLabel({'Pick Status':'LOCKED','Stats Final?':'NO'},'HOLD'),'LIVE • PROVISIONAL');
-  assert.equal(participantStatusLabel({'Stats Final?':'YES'},'HOLD'),'FINAL • VERIFYING STATS');
+  assert.equal(participantStatusLabel({'Stats Final?':'YES'},'HOLD'),'FINAL • PUBLICATION HOLD');
+  assert.equal(participantStatusLabel({'Stats Final?':'YES'},''),'FINAL • CERTIFICATION PENDING');
   assert.equal(participantStatusLabel({'Stats Final?':'YES'},'PUBLISH'),'FINAL • OFFICIAL');
 });
 

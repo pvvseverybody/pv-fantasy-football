@@ -4,6 +4,7 @@ import {LINEUP_SLOTS, saveLineupSubmission} from '../../../lib/lineup-submission
 import {dateToSheetsSerial, promoteLineupSubmission} from '../../../lib/authoritative-lineups';
 import {AUTH_COOKIE,bindAuthenticatedLineup,cookieValue,requiredAuthConfig,secureRequest} from '../../../lib/participant-auth.mjs';
 import {participantAuthService} from '../../../lib/participant-auth-service';
+import {logServerFailure} from '../../../lib/safe-server-log.mjs';
 
 const SLOT_POS = {
   RB:['RB'], WR:['WR'], TE:['TE'], 'Offensive Flex':['QB','RB','WR','TE'],
@@ -79,7 +80,7 @@ export async function POST(request) {
       version:promoted.version
     }, {status:promoted.duplicate ? 200 : 201});
   } catch (error) {
-    console.error('POST /api/lineup failed:', error);
+    logServerFailure('lineup',error);
     const code = error.code || 'SERVER_ERROR';
     const status = code === 'AUTH_NOT_CONFIGURED' ? 503 : ['INVALID_IDENTITY','IDENTITY_REVIEW_REQUIRED'].includes(code) ? 400 :
       code === 'LATE_SUBMISSION' ? 409 : 500;

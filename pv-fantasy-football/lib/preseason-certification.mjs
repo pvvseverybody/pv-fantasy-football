@@ -153,7 +153,7 @@ function rebuildLeaderboard(store) {
     .map((item,index) => ({rank:index + 1,...item}));
 }
 
-export function scoreCertificationGame(store, gameId) {
+export function scoreCertificationGame(store, gameId, {publish=true} = {}) {
   verifyWriterInvariants(store, gameId);
   const sourceRows = [...store.gameStats.values()].filter(row => row.gameId === gameId);
   const stagedScores = new Map();
@@ -209,8 +209,8 @@ export function scoreCertificationGame(store, gameId) {
   }
   rebuildLeaderboard(store);
   store.reconciliation.set(gameId,{status:'PASS',differences:0,unmatched:0,criticalQa:0});
-  store.publishControl.set(gameId,'PUBLISH');
-  return {playersScored:stagedScores.size, publication:'PUBLISH'};
+  store.publishControl.set(gameId,publish?'PUBLISH':'HOLD');
+  return {playersScored:stagedScores.size, publication:publish?'PUBLISH':'HOLD'};
 }
 
 export function snapshotCertificationState(store) {
