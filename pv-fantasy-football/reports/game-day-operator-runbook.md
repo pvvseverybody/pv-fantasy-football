@@ -2,6 +2,10 @@
 
 This runbook is for a non-developer. Use the protected Game-day Operations page. Do not edit score tables or publish because a game merely looks final.
 
+## STAGING DEPLOYMENT
+
+Use only the isolated staging workbook and staging-scoped credentials. Confirm `/api/health` says `staging`, release mode `BETA`, and deployment safety `SAFE`; then confirm the protected public-opening gate is `READY_FOR_STAGING`, run `pnpm certify:w0-dry-run`, and complete the 3–5 tester package. A staging deployment must never use `PUBLIC` mode or the production workbook marker. Moving beyond staging requires recorded beta PASS plus explicit production authorization.
+
 ## PRE-LAUNCH
 
 **You should see:** System Readiness is at least READY FOR BETA; configuration and workbook schema are configured/compatible; Season Launch Preflight has no BLOCKED diagnostics; W0 Tarleton is the only OPEN game; W1 and later are PENDING; publication is HOLD.

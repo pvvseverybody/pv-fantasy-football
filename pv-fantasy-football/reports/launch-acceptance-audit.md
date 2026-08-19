@@ -119,6 +119,8 @@ The repository now includes a pinned pnpm version, lockfile, and patched `sharp`
 - Isolated W0 Tarleton launch simulation proving pre-lock replacement, duplicate idempotency, kickoff rejection, provisional/final scoring, publication HOLD, fallback, reconciliation, and final release.
 - Session-bound accepted-lineup recovery without exposing Participant IDs or Submission IDs.
 - Sanitized server failure logging and regression coverage preventing upstream messages, stacks, workbook IDs, credentials, emails, and tokens from entering logs.
+- Vercel staging readiness, safe health/version reporting, explicit environment/workbook isolation guards, and a public-opening gate that never changes release mode.
+- Master `certify:w0-dry-run` command covering tests, optimized build, W0 simulation, failure/cutoff/schema checks, and repository secret scanning.
 - Fail-closed production configuration status that never returns configuration values.
 - Read-only critical-tab connectivity and schema-drift validation, including strict write-table order and duplicate-header detection.
 - Participant failure states, explicit schedule/player-pool failures, and full eight-player accepted-lineup confirmation.

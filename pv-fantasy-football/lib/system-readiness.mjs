@@ -1,6 +1,6 @@
 const upper=value=>String(value??'').trim().toUpperCase();
 
-export function evaluateSystemReadiness({configuration,connectivity,preflight,gameReadiness,releaseMode={mode:'DEVELOPMENT'},betaAcceptance={status:'PENDING'}}={}){
+export function evaluateSystemReadiness({configuration,connectivity,preflight,gameReadiness,releaseMode={mode:'DEVELOPMENT'},betaAcceptance={status:'PENDING'},deploymentSafety={status:'SAFE'}}={}){
   const reasons=[];
   if(configuration?.status!=='CONFIGURED')reasons.push('PRODUCTION_CONFIGURATION_REQUIRED');
   if(connectivity?.status==='UNAVAILABLE')reasons.push('WORKBOOK_UNAVAILABLE');
@@ -8,8 +8,9 @@ export function evaluateSystemReadiness({configuration,connectivity,preflight,ga
   if(preflight?.status==='BLOCKED')reasons.push('SEASON_PREFLIGHT_BLOCKED');
   if(preflight?.status==='HOLD')reasons.push('SEASON_PREFLIGHT_HOLD');
   if(!gameReadiness)reasons.push('GAME_READINESS_UNAVAILABLE');
+  if(deploymentSafety.status!=='SAFE')reasons.push('DEPLOYMENT_CONFIGURATION_BLOCKED');
   const publication=upper(gameReadiness?.publication?.status)||'UNKNOWN';
-  const hardBlocked=reasons.some(reason=>['WORKBOOK_UNAVAILABLE','WORKBOOK_SCHEMA_INCOMPATIBLE','SEASON_PREFLIGHT_BLOCKED'].includes(reason));
+  const hardBlocked=reasons.some(reason=>['WORKBOOK_UNAVAILABLE','WORKBOOK_SCHEMA_INCOMPATIBLE','SEASON_PREFLIGHT_BLOCKED','DEPLOYMENT_CONFIGURATION_BLOCKED'].includes(reason));
   let status;
   if(configuration?.status!=='CONFIGURED')status='CONFIGURATION REQUIRED';
   else if(hardBlocked)status='BLOCKED';
@@ -31,6 +32,7 @@ export function evaluateSystemReadiness({configuration,connectivity,preflight,ga
     publication,
     release_mode:releaseMode.mode,
     beta_acceptance:betaAcceptance.status,
+    deployment_safety:deploymentSafety.status,
     note:status==='READY FOR BETA'?'Code-verifiable prerequisites pass. Human beta acceptance is still required before public entry.':undefined,
   };
 }

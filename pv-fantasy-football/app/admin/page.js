@@ -3,6 +3,9 @@ import {evaluateGameDayReadiness} from '../../lib/game-day-readiness.mjs';
 import {evaluateSeasonLaunchPreflight} from '../../lib/season-launch-preflight.mjs';
 import {getSystemReadiness} from '../../lib/system-readiness-service';
 import {readBetaAcceptance} from '../../lib/beta-acceptance-service';
+import {evaluateDeploymentSafety} from '../../lib/deployment-safety.mjs';
+import {deploymentVersion} from '../../lib/deployment-version.mjs';
+import {evaluatePublicOpeningGate} from '../../lib/public-opening-gate.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +14,9 @@ const display = value => value === null || value === undefined || value === '' ?
 export default async function AdminPage({searchParams}) {
   const system=await getSystemReadiness().catch(()=>({status:'BLOCKED',safe_to_open_to_participants:false,reasons:['SYSTEM_READINESS_UNAVAILABLE'],configuration:{items:[]},sheets:{status:'UNAVAILABLE',schema_status:'UNKNOWN'}}));
   const beta=readBetaAcceptance();
+  const deployment=evaluateDeploymentSafety(process.env),version=deploymentVersion();
+  const preflightGate=system.season_preflight==='READY'?true:system.season_preflight==='BLOCKED'?'BLOCKED':false;const workbookGate=system.sheets?.status==='CONNECTED'&&system.sheets?.schema_status==='COMPATIBLE'?true:system.configuration?.status==='CONFIGURED'?'BLOCKED':false;
+  const publicGate=evaluatePublicOpeningGate({CONFIGURATION:system.configuration?.status,WORKBOOK:workbookGate,ROSTER:preflightGate,BETA_ACCEPTANCE:beta.status==='PASS',W0_ENTRY_WINDOW:preflightGate,AUTHENTICATION:system.participant_auth,SCORING:system.scoring,LIVE_PROVIDER_CERTIFICATION:String(process.env.PV_LIVE_PROVIDER_CERTIFIED).toUpperCase()==='YES',DEFENSIVE_FALLBACK:String(process.env.PV_DEFENSIVE_FALLBACK_CERTIFIED).toUpperCase()==='YES',PUBLICATION_SAFETY:['HOLD','PUBLISH'].includes(system.publication),DEPLOYMENT_VERSION:deployment.status==='BLOCKED'?'BLOCKED':version.commit!=='LOCAL'});
   let tables;
   try {
     tables = await readGameDayTables();
@@ -49,7 +55,8 @@ export default async function AdminPage({searchParams}) {
       <p className="eyebrow">INTERNAL • READ ONLY</p><h1>Game-day operations</h1>
       <p>Authoritative status assembled from the existing workbook gates and pipeline tables.</p>
       <div className={`adminReadiness ${system.status.includes('READY')?'ready':system.status.includes('HOLD')||system.status.includes('CONFIGURATION')?'hold':'blocked'}`}><span>CAN PV FANTASY SAFELY OPEN?</span><strong>{system.status}</strong></div>
-      <div className="adminGrid systemGrid">{[['Release mode',system.release_mode],['Beta acceptance',`${beta.status} (${beta.passed}/${beta.total})`],['Sheets',system.sheets.status],['Schema',system.sheets.schema_status],['Participant authentication',system.participant_auth],['Scoring configuration',system.scoring],['Publication',system.publication]].map(([label,value])=><article className="adminCard" key={label}><span>{label}</span><strong>{value}</strong></article>)}</div>
+      <div className="adminGrid systemGrid">{[['Build',`${version.application_version} • ${version.commit}`],['Environment',deployment.environment],['Release mode',system.release_mode],['Public-opening gate',publicGate.status],['Beta acceptance',`${beta.status} (${beta.passed}/${beta.total})`],['Sheets',system.sheets.status],['Schema',system.sheets.schema_status],['Participant authentication',system.participant_auth],['Scoring configuration',system.scoring],['Publication',system.publication]].map(([label,value])=><article className="adminCard" key={label}><span>{label}</span><strong>{value}</strong></article>)}</div>
+      {publicGate.status!=='READY_FOR_PUBLIC_AUTHORIZATION'&&<div className="diagnosticList">{publicGate.checks.filter(item=>item.status!=='PASS').map(item=><article className="diagnostic hold" key={item.name}><div><strong>{item.name.replaceAll('_',' ')}</strong><span>{item.status}</span></div></article>)}</div>}
       <div className={`adminReadiness ${launch.status.toLowerCase()}`}><span>SEASON LAUNCH</span><strong>{launch.status}</strong></div>
       <form className="adminSelector" method="get"><label><span>Selected game</span><select name="game_id" defaultValue={gameId}>{games.map(game=><option key={game.game_id} value={game.game_id}>{game.game_id} — {game.opponent}</option>)}</select></label><button type="submit">View status</button></form>
       <div className={`adminReadiness ${status.readiness.toLowerCase()}`}><span>GAME READINESS</span><strong>{status.readiness}</strong></div>

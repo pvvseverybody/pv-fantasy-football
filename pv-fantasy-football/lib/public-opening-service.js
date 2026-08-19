@@ -1,0 +1,7 @@
+import 'server-only';
+import {getSystemReadiness} from './system-readiness-service';
+import {evaluateDeploymentSafety} from './deployment-safety.mjs';
+import {deploymentVersion} from './deployment-version.mjs';
+import {evaluatePublicOpeningGate} from './public-opening-gate.mjs';
+const yes=value=>String(value??'').trim().toUpperCase()==='YES';
+export async function getPublicOpeningGate(environment=process.env){const system=await getSystemReadiness({environment});const deployment=evaluateDeploymentSafety(environment);const version=deploymentVersion(environment);const workbook=system.sheets.status==='CONNECTED'&&system.sheets.schema_status==='COMPATIBLE'?true:system.configuration.status==='CONFIGURED'?'BLOCKED':false;const preflight=system.season_preflight==='READY'?true:system.season_preflight==='BLOCKED'?'BLOCKED':false;return{...evaluatePublicOpeningGate({CONFIGURATION:system.configuration.status,WORKBOOK:workbook,ROSTER:preflight,BETA_ACCEPTANCE:system.beta_acceptance==='PASS',W0_ENTRY_WINDOW:preflight,AUTHENTICATION:system.participant_auth,SCORING:system.scoring,LIVE_PROVIDER_CERTIFICATION:yes(environment.PV_LIVE_PROVIDER_CERTIFIED),DEFENSIVE_FALLBACK:yes(environment.PV_DEFENSIVE_FALLBACK_CERTIFIED),PUBLICATION_SAFETY:['HOLD','PUBLISH'].includes(system.publication),DEPLOYMENT_VERSION:deployment.status==='BLOCKED'?'BLOCKED':version.commit!=='LOCAL'}),environment:deployment.environment,release_mode:deployment.release_mode,version};}

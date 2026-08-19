@@ -89,6 +89,12 @@ The protected read-only operations surface includes a season-wide launch preflig
 
 Run `pnpm certify:w0-launch` for the isolated W0 Tarleton launch simulation. It exercises pre-lock replacement, exact retry idempotency, lock and late rejection, incremental/provisional scoring, official-final HOLD, defensive fallback, reconciliation, explicit publication, results eligibility, and leaderboard generation without network or workbook writes.
 
+## Staging deployment
+
+Vercel must use this directory as the project root, `pnpm install --frozen-lockfile`, and `pnpm build`; the application requires a Node server runtime and is not a static export. Set `PV_FANTASY_ENV=staging`, `PV_FANTASY_RELEASE_MODE=BETA`, and pin `BACKEND_SPREADSHEET_ID` to the same isolated value as `PV_FANTASY_STAGING_SPREADSHEET_ID`. Staging rejects `PUBLIC` mode and, when the production workbook marker is supplied, rejects an accidental production-workbook match. `/api/health` returns only safe process/configuration/version categories and performs no Sheets read. Full readiness and public-opening checks remain protected admin routes.
+
+Run `pnpm certify:w0-dry-run` before creating a preview deployment. It runs the complete tests, optimized build, W0 simulation, dangerous-state/cutoff/schema checks, and a repository credential-file/private-key scan; any failure exits non-zero. See `reports/staging-deployment-readiness.md` and `reports/beta-acceptance-package.md` for the environment matrix, serverless/concurrency findings, staging steps, and tester checklist.
+
 ## Launch acceptance
 
 - `reports/launch-acceptance-audit.md` is the authoritative pre-deployment audit, environment list, production-data checklist, and launch classification.

@@ -61,4 +61,5 @@ test('system readiness distinguishes configuration, schema, and preseason holds'
   assert.equal(evaluateSystemReadiness({...readyInput(),configuration:evaluateProductionConfig({})}).status,'CONFIGURATION REQUIRED');
   assert.equal(evaluateSystemReadiness({...readyInput(),connectivity:{status:'CONNECTED_WITH_SCHEMA_ERRORS',schema:{status:'INCOMPATIBLE'}}}).status,'BLOCKED');
   assert.equal(evaluateSystemReadiness({...readyInput(),preflight:{status:'HOLD'}}).status,'PRESEASON HOLD');
+  assert.equal(evaluateSystemReadiness({...readyInput(),releaseMode:{mode:'PUBLIC'},deploymentSafety:{status:'BLOCKED'}}).status,'BLOCKED');
 });
