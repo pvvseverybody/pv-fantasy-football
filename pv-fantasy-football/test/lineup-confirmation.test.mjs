@@ -9,3 +9,7 @@ test('accepted lineup confirmation includes the required audit details',async()=
   assert.match(lineup,/confirmationLineup/);
   assert.match(lineup,/LINEUP_SLOTS\.map/);
 });
+test('accepted lineup confirmation scrolls to the top',async()=>{
+  const lineup=await readFile(new URL('../app/lineup/page.js',import.meta.url),'utf8');
+  assert.match(lineup,/if\(step===5\) window\.scrollTo\(\{top:0,behavior:'smooth'\}\)/);
+});

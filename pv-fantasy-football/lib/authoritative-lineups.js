@@ -78,7 +78,7 @@ function firstBlankRow(rows, keyIndex = 0, count = 1) {
     }
     return true;
   });
-  if (index === -1) throw new Error('Authoritative sheet has no available row.');
+  if (index === -1) return data.length + 4;
   return index + 4;
 }
 

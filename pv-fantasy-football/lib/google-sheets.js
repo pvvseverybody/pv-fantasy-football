@@ -25,7 +25,7 @@ async function sheetsRequest(path, options = {}) {
   const token = await client.getAccessToken();
   const spreadsheetId = required('BACKEND_SPREADSHEET_ID');
 
-  const separator = path.startsWith('?') ? '' : '/';
+  const separator = path.startsWith('?') || path.startsWith(':') ? '' : '/';
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}${separator}${path}`;
 
   const response = await fetch(url, {
@@ -37,11 +37,12 @@ async function sheetsRequest(path, options = {}) {
     cache: 'no-store',
   });
 
-  if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`Google Sheets request failed (${response.status}): ${detail.slice(0, 300)}`);
-  }
-
+if (!response.ok) {
+  const detail = await response.text();
+  const error = new Error(`Google Sheets request failed (${response.status}): ${detail.slice(0, 300)}`);
+  error.status = response.status;
+  throw error;
+}
   return response.json();
 }
 
@@ -59,13 +60,12 @@ export async function getSpreadsheetMetadata() {
 }
 
 export async function batchUpdateSpreadsheet(requests) {
-  return sheetsRequest('batchUpdate', {
+  return sheetsRequest(':batchUpdate', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({requests}),
   });
 }
-
 export async function appendSheetRow(range, row) {
   return sheetsRequest(
     `values/${encodeURIComponent(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
