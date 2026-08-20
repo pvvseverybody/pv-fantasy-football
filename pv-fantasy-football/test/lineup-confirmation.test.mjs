@@ -11,5 +11,12 @@ test('accepted lineup confirmation includes the required audit details',async()=
 });
 test('accepted lineup confirmation scrolls to the top',async()=>{
   const lineup=await readFile(new URL('../app/lineup/page.js',import.meta.url),'utf8');
-  assert.match(lineup,/if\(step===5\) window\.scrollTo\(\{top:0,behavior:'smooth'\}\)/);
+    assert.match(lineup,/if\(step===3\|\|step===5\) window\.scrollTo\(\{top:0,behavior:'smooth'\}\)/);
+});
+test('open game card enters the lineup builder directly',async()=>{
+  const lineup=await readFile(new URL('../app/lineup/page.js',import.meta.url),'utf8');
+  assert.match(
+    lineup,
+    /setGameId\(item\.game_id\);\s*if\(item\.pick_status==='OPEN'\) setStep\(3\);/
+  );
 });
