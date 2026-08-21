@@ -57,9 +57,12 @@ export function participantStatusLabel(game={}, releaseStatus='') {
 export function publicLeaderboard({weekly=[],leaderboard=[],games=[],releaseStatus=''}, week='') {
   const safeWeekly = weekly.filter(row => !isDemoRecord(row) && String(row.Validation || '').toUpperCase() === 'VALID');
   const selectedWeek = week || games.find(game => String(game['Pick Status']).toUpperCase() === 'OPEN')?.Week || games[0]?.Week || '';
-  const weeklyLeaders = safeWeekly.filter(row => !selectedWeek || row.Week === selectedWeek).sort((a,b)=>number(b['Fantasy Score'])-number(a['Fantasy Score'])).map((row,index)=>({rank:index+1, participant:row['Display Name'], points:number(row['Fantasy Score'])}));
-  const cumulative = leaderboard.filter(row=>!isDemoRecord(row)).sort((a,b)=>number(a.Rank)-number(b.Rank)).map(row=>({rank:number(row.Rank),participant:row['Display Name'],season_points:number(row.Total),average:number(row.Avg),best_week:number(row['Best Week'])}));
   const selectedGame=games.find(game=>game.Week===selectedWeek)||{};
+  const isPregame=String(selectedGame['Pick Status']).toUpperCase()==='OPEN';
+  const hasCompletedHistory=games.some(game=>game.Week!==selectedWeek&&(String(game['Pick Status']).toUpperCase()==='LOCKED'||String(game['Stats Final?']).toUpperCase()==='YES'));
+  const weeklyLeaders=isPregame?[]:safeWeekly.filter(row => !selectedWeek || row.Week === selectedWeek).sort((a,b)=>number(b['Fantasy Score'])-number(a['Fantasy Score'])).map((row,index)=>({rank:index+1, participant:row['Display Name'], points:number(row['Fantasy Score'])}));
+  const cumulativeLeaders=leaderboard.filter(row=>!isDemoRecord(row)).sort((a,b)=>number(a.Rank)-number(b.Rank)).map(row=>({rank:number(row.Rank),participant:row['Display Name'],season_points:number(row.Total),average:number(row.Avg),best_week:number(row['Best Week'])}));
+  const cumulative=isPregame&&!hasCompletedHistory?[]:cumulativeLeaders;
   return {week:selectedWeek,status_label:participantStatusLabel(selectedGame,releaseStatus),weekly:weeklyLeaders,cumulative};
 }
 
