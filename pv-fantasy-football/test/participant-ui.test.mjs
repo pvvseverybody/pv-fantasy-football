@@ -44,3 +44,17 @@ test('official assets resolve by authoritative opponent without altering lineup 
   assert.equal(officialAsset('pvamu').approved,true);
   assert.equal(officialAsset('pv-fantasy').approved,true);
 });
+
+test('player directory presents weekly and season fantasy production',async()=>{
+  const page=await source('app/players/page.js');
+  assert.match(page,/week_points/);
+  assert.match(page,/season_points/);
+  assert.match(page,/status_label/);
+});
+test('player directory opens week-by-week fantasy history in a player stats drawer',async()=>{
+  const page=await source('app/players/page.js');
+  assert.match(page,/history/);
+  assert.match(page,/selectedPlayer/);
+  assert.match(page,/playerStatsDrawer/);
+  assert.match(page,/playerStatsBackdrop/);
+});

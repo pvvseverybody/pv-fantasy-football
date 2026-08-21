@@ -66,6 +66,75 @@ export function publicLeaderboard({weekly=[],leaderboard=[],games=[],releaseStat
   return {week:selectedWeek,status_label:participantStatusLabel(selectedGame,releaseStatus),weekly:weeklyLeaders,cumulative};
 }
 
+export function publicPlayerDirectory({players=[],scores=[],games=[],releaseStatus=''}, week='', nowEpoch=Date.now()) {
+  const timedGames=games
+    .map(game=>({...game,kickoff_epoch:centralKickoffEpoch(game['Kickoff (CT)'])}))
+    .filter(game=>game.kickoff_epoch!==null)
+    .sort((a,b)=>a.kickoff_epoch-b.kickoff_epoch);
+
+  const featuredByTime=timedGames.length
+    ? [...timedGames].reverse().find(game=>nowEpoch>=game.kickoff_epoch-(48*60*60*1000))||timedGames[0]
+    : null;
+
+  const selectedWeek=week||featuredByTime?.Week||games.find(game=>String(game['Pick Status']).toUpperCase()==='OPEN')?.Week||games[0]?.Week||'';
+  const selectedGame=games.find(game=>game.Week===selectedWeek)||{};
+  const selectedGameId=selectedGame['Game ID']||'';
+  const isPregame=String(selectedGame['Pick Status']).toUpperCase()==='OPEN';
+
+  const completedGameIds=new Set(
+    games
+      .filter(game=>String(game['Pick Status']).toUpperCase()==='LOCKED'||String(game['Stats Final?']).toUpperCase()==='YES')
+      .map(game=>game['Game ID'])
+      .filter(Boolean)
+  );
+
+  const currentScores=new Map(
+    scores
+      .filter(row=>row['Game ID']===selectedGameId&&row['Player ID'])
+      .map(row=>[row['Player ID'],number(row.TOTAL)])
+  );
+
+  const seasonTotals=new Map();
+  const seasonPlayers=new Set();
+  const scoreLookup=new Map();
+
+  for(const row of scores){
+    const playerId=row['Player ID'];
+    const gameId=row['Game ID'];
+    if(!playerId||!gameId)continue;
+
+    scoreLookup.set(`${gameId}::${playerId}`,number(row.TOTAL));
+
+    if(!completedGameIds.has(gameId))continue;
+    seasonPlayers.add(playerId);
+    seasonTotals.set(playerId,(seasonTotals.get(playerId)||0)+number(row.TOTAL));
+  }
+
+  return {
+    week:selectedWeek,
+    status_label:participantStatusLabel(selectedGame,releaseStatus),
+    players:players.map(player=>{
+      const playerId=player.player_key||player['Player ID']||'';
+      const history=games
+        .filter(game=>completedGameIds.has(game['Game ID']))
+        .map(game=>{
+          const gameId=game['Game ID']||'';
+          const key=`${gameId}::${playerId}`;
+          return {
+            week:game.Week||'',
+            points:scoreLookup.has(key)?scoreLookup.get(key):null
+          };
+        });
+
+      return {
+        ...player,
+        week_points:isPregame||!currentScores.has(playerId)?null:currentScores.get(playerId),
+        season_points:seasonPlayers.has(playerId)?seasonTotals.get(playerId):null,
+        history
+      };
+    })
+  };
+}
 export function participantResults({participants=[],active=[],picks=[],scores=[],weekly=[],games=[],players=[],releaseStatus=''}, email) {
   const normalized=String(email||'').trim().toLowerCase();
   const participant=participants.find(row=>!isDemoRecord(row)&&String(row.Active).toUpperCase()==='YES'&&String(row['Identity Status']).toUpperCase()==='VERIFIED'&&[row['Normalized Email'],row.Email].some(value=>String(value||'').trim().toLowerCase()===normalized));

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {LINEUP_SLOTS,centralKickoffEpoch,participantResults,participantStatusLabel,playerLabel,publicLeaderboard,submissionOutcome,validateLineupDraft} from '../lib/participant-experience.mjs';
+import {LINEUP_SLOTS,centralKickoffEpoch,participantResults,participantStatusLabel,playerLabel,publicLeaderboard,publicPlayerDirectory,submissionOutcome,validateLineupDraft} from '../lib/participant-experience.mjs';
 
 test('draft requires eight unique player selections',()=>{
   assert.equal(validateLineupDraft({}).code,'INCOMPLETE_LINEUP');
@@ -69,4 +69,119 @@ test('participant results expose only accepted scoring-version picks',()=>{
 test('participant results do not reveal picks while entry remains open',()=>{
   const fixture={participants:[{'Participant ID':'PART-1','Display Name':'Panther One',Email:'one@example.com',Active:'YES','Identity Status':'VERIFIED'}],active:[{'Game ID':'G1','Participant ID':'PART-1','Accepted?':'YES','Scoring Version?':'YES'}],games:[{'Game ID':'G1','Pick Status':'OPEN'}]};
   assert.deepEqual(participantResults(fixture,'one@example.com').lineups,[]);
+});
+
+test('public player directory hides fantasy production before the current week locks',()=>{
+  const result=publicPlayerDirectory({
+    games:[{'Game ID':'G0',Week:'W0','Pick Status':'OPEN'}],
+    scores:[{'Game ID':'G0',Week:'W0','Player ID':'P1',TOTAL:18.7}],
+    players:[{player_key:'P1',display_name:'Panther Runner',position:'RB',side:'OFF',eligible_slots:['RB','Offensive Flex']}]
+  });
+  assert.equal(result.week,'W0');
+  assert.equal(result.players[0].week_points,null);
+  assert.equal(result.players[0].season_points,null);
+});
+
+test('public player directory exposes authoritative player points after lineup lock',()=>{
+  const result=publicPlayerDirectory({
+    games:[{'Game ID':'G0',Week:'W0','Pick Status':'LOCKED'}],
+    scores:[{'Game ID':'G0',Week:'W0','Player ID':'P1',TOTAL:18.7}],
+    players:[{player_key:'P1',display_name:'Panther Runner',position:'RB',side:'OFF',eligible_slots:['RB','Offensive Flex']}]
+  });
+  assert.equal(result.players[0].week_points,18.7);
+  assert.equal(result.players[0].season_points,18.7);
+});
+
+test('public player directory preserves prior season totals while a later week remains open',()=>{
+  const result=publicPlayerDirectory({
+    games:[
+      {'Game ID':'G0',Week:'W0','Pick Status':'LOCKED'},
+      {'Game ID':'G1',Week:'W1','Pick Status':'OPEN'}
+    ],
+    scores:[
+      {'Game ID':'G0',Week:'W0','Player ID':'P1',TOTAL:18.7},
+      {'Game ID':'G1',Week:'W1','Player ID':'P1',TOTAL:99}
+    ],
+    players:[{player_key:'P1',display_name:'Panther Runner',position:'RB',side:'OFF',eligible_slots:['RB','Offensive Flex']}]
+  });
+  assert.equal(result.week,'W1');
+  assert.equal(result.players[0].week_points,null);
+  assert.equal(result.players[0].season_points,18.7);
+});
+test('public player directory keeps the prior scored week until 48 hours before the next kickoff',()=>{
+  const games=[
+    {'Game ID':'G0',Week:'W0','Pick Status':'LOCKED','Kickoff (CT)':'8/29/2026 8:00 PM'},
+    {'Game ID':'G1',Week:'W1','Pick Status':'OPEN','Kickoff (CT)':'9/5/2026 8:00 PM'}
+  ];
+  const scores=[
+    {'Game ID':'G0',Week:'W0','Player ID':'P1',TOTAL:18.7}
+  ];
+  const players=[
+    {player_key:'P1',display_name:'Panther Runner',position:'RB',side:'OFF',eligible_slots:['RB','Offensive Flex']}
+  ];
+
+  const beforeSwitch=centralKickoffEpoch('9/3/2026 7:59 PM');
+  const result=publicPlayerDirectory({games,scores,players},'',beforeSwitch);
+
+  assert.equal(result.week,'W0');
+  assert.equal(result.players[0].week_points,18.7);
+  assert.equal(result.players[0].season_points,18.7);
+});
+
+test('public player directory switches to the upcoming week 48 hours before kickoff',()=>{
+  const games=[
+    {'Game ID':'G0',Week:'W0','Pick Status':'LOCKED','Kickoff (CT)':'8/29/2026 8:00 PM'},
+    {'Game ID':'G1',Week:'W1','Pick Status':'OPEN','Kickoff (CT)':'9/5/2026 8:00 PM'}
+  ];
+  const scores=[
+    {'Game ID':'G0',Week:'W0','Player ID':'P1',TOTAL:18.7}
+  ];
+  const players=[
+    {player_key:'P1',display_name:'Panther Runner',position:'RB',side:'OFF',eligible_slots:['RB','Offensive Flex']}
+  ];
+
+  const atSwitch=centralKickoffEpoch('9/3/2026 8:00 PM');
+  const result=publicPlayerDirectory({games,scores,players},'',atSwitch);
+
+  assert.equal(result.week,'W1');
+  assert.equal(result.players[0].week_points,null);
+  assert.equal(result.players[0].season_points,18.7);
+});
+test('public player directory history contains completed weeks only and does not expose future scores',()=>{
+  const result=publicPlayerDirectory({
+    games:[
+      {'Game ID':'G0',Week:'W0','Pick Status':'LOCKED'},
+      {'Game ID':'G1',Week:'W1','Pick Status':'OPEN'},
+      {'Game ID':'G2',Week:'W2','Pick Status':'PENDING'}
+    ],
+    scores:[
+      {'Game ID':'G0',Week:'W0','Player ID':'P1',TOTAL:18.7},
+      {'Game ID':'G1',Week:'W1','Player ID':'P1',TOTAL:99}
+    ],
+    players:[
+      {player_key:'P1',display_name:'Panther Runner',position:'RB',side:'OFF',eligible_slots:['RB','Offensive Flex']}
+    ]
+  });
+
+  assert.deepEqual(result.players[0].history,[
+    {week:'W0',points:18.7}
+  ]);
+});
+
+test('public player directory preserves a legitimate zero-point game in player history',()=>{
+  const result=publicPlayerDirectory({
+    games:[
+      {'Game ID':'G0',Week:'W0','Pick Status':'LOCKED'}
+    ],
+    scores:[
+      {'Game ID':'G0',Week:'W0','Player ID':'P1',TOTAL:0}
+    ],
+    players:[
+      {player_key:'P1',display_name:'Panther Runner',position:'RB',side:'OFF',eligible_slots:['RB','Offensive Flex']}
+    ]
+  });
+
+  assert.deepEqual(result.players[0].history,[
+    {week:'W0',points:0}
+  ]);
 });

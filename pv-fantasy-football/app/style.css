@@ -309,3 +309,361 @@ html{background:#08070d;scroll-behavior:smooth}body{min-width:320px;background:r
 }
 /* Allow navigation popover to render outside the nav bar */
 .siteNav{overflow:visible}
+
+/* Player fantasy production */
+.playerDirectoryMeta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  margin:18px 0 24px;
+  padding:15px 18px;
+  border:1px solid #38313f;
+  border-radius:10px;
+  background:#15131a;
+}
+
+.playerDirectoryMeta>div{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex:none;
+}
+
+.playerDirectoryMeta span{
+  color:var(--gold);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+
+.playerDirectoryMeta strong{
+  color:#fff;
+  font-size:12px;
+  letter-spacing:.04em;
+}
+
+.playerDirectoryMeta p{
+  margin:0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.45;
+  text-align:right;
+}
+
+.playerDirectory article{
+  min-height:150px;
+}
+
+.playerDirectoryIdentity{
+  min-width:0;
+}
+
+.playerEligibility{
+  grid-column:2;
+}
+
+.playerFantasy{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  margin-top:4px;
+  overflow:hidden;
+  border:1px solid #312b38;
+  border-radius:8px;
+  background:#312b38;
+}
+
+.playerFantasy>div{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  background:#100e14;
+}
+
+.playerFantasy span{
+  color:#8f8995;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+
+.playerFantasy strong{
+  color:var(--gold);
+  font-family:var(--display);
+  font-size:21px;
+  letter-spacing:.03em;
+}
+
+@media(max-width:760px){
+  .playerDirectoryMeta{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .playerDirectoryMeta p{
+    text-align:left;
+  }
+
+  .playerDirectory article{
+    min-height:142px;
+  }
+}
+/* Player weekly fantasy history */
+.playerHistoryToggle{
+  grid-column:1/-1;
+  width:100%;
+  min-height:38px!important;
+  margin-top:2px;
+  padding:8px 12px!important;
+  border:1px solid #3c3444!important;
+  border-radius:7px!important;
+  background:#1b1720!important;
+  box-shadow:none!important;
+  color:#c9c2cf!important;
+  font-family:Arial,sans-serif!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase;
+}
+
+.playerHistoryToggle:hover{
+  border-color:#675276!important;
+  background:#221b29!important;
+  color:var(--gold)!important;
+  transform:none!important;
+  filter:none!important;
+}
+
+.playerHistoryToggle[aria-expanded="true"]{
+  border-color:#654986!important;
+  background:#251a30!important;
+  color:var(--gold)!important;
+}
+
+.playerHistory{
+  grid-column:1/-1;
+  overflow:hidden;
+  margin-top:2px;
+  border:1px solid #342d3b;
+  border-radius:8px;
+  background:#0e0c11;
+}
+
+.playerHistoryHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  border-bottom:1px solid #302936;
+  background:#17131b;
+}
+
+.playerHistoryHead strong{
+  color:#fff;
+  font-size:10px;
+  letter-spacing:.08em;
+}
+
+.playerHistoryHead span{
+  color:#807887;
+  font-size:9px;
+}
+
+.playerHistoryRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:36px;
+  padding:7px 12px;
+  border-bottom:1px solid #252129;
+}
+
+.playerHistoryRow:last-child{
+  border-bottom:0;
+}
+
+.playerHistoryRow span{
+  color:#9e96a5;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+
+.playerHistoryRow strong{
+  color:var(--gold);
+  font-family:var(--display);
+  font-size:17px;
+  letter-spacing:.03em;
+}
+
+@media(max-width:760px){
+  .playerHistoryHead{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:3px;
+  }
+
+  .playerHistoryToggle{
+    min-height:42px!important;
+  }
+}
+/* Player fantasy history drawer */
+.playerStatsBackdrop{
+  position:fixed!important;
+  z-index:219!important;
+  inset:0!important;
+  width:100%!important;
+  min-height:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#0009!important;
+  box-shadow:none!important;
+  cursor:default!important;
+  text-transform:none!important;
+}
+
+.playerStatsBackdrop:hover{
+  filter:none!important;
+  transform:none!important;
+}
+
+.playerStatsDrawer{
+  position:fixed;
+  z-index:220;
+  top:0;
+  right:0;
+  bottom:0;
+  width:min(460px,42vw);
+  overflow-y:auto;
+  border-left:1px solid #4a3d55;
+  background:#0d0c11;
+  box-shadow:-24px 0 60px #000a;
+}
+
+.playerStatsHead{
+  position:sticky;
+  z-index:2;
+  top:0;
+  display:grid;
+  grid-template-columns:48px 1fr 42px;
+  align-items:center;
+  gap:14px;
+  padding:20px;
+  border-bottom:1px solid #3b3343;
+  background:#151119f5;
+  backdrop-filter:blur(14px);
+}
+
+.playerStatsHead>div:nth-child(2){
+  min-width:0;
+}
+
+.playerStatsHead span{
+  display:block;
+  margin-bottom:3px;
+  color:var(--gold);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.11em;
+}
+
+.playerStatsHead h2{
+  margin:0;
+  color:#fff;
+  font-size:28px;
+  line-height:1;
+}
+
+.playerStatsHead small{
+  display:block;
+  margin-top:6px;
+  color:#9d95a4;
+  font-size:10px;
+}
+
+.playerStatsSummary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  margin:20px;
+  overflow:hidden;
+  border:1px solid #342d3b;
+  border-radius:9px;
+  background:#342d3b;
+}
+
+.playerStatsSummary>div{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px;
+  background:#15121a;
+}
+
+.playerStatsSummary span{
+  color:#8f8995;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+
+.playerStatsSummary strong{
+  color:var(--gold);
+  font-family:var(--display);
+  font-size:24px;
+}
+
+.playerStatsDrawer .playerHistory{
+  margin:0 20px 24px;
+}
+
+.playerHistoryEmpty{
+  padding:34px 18px;
+  color:#918a97;
+  font-size:12px;
+  line-height:1.5;
+  text-align:center;
+}
+
+@media(max-width:760px){
+  .playerStatsDrawer{
+    top:auto;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100%;
+    max-height:90svh;
+    border-left:0;
+    border-top:1px solid #5a4967;
+    border-radius:18px 18px 0 0;
+    box-shadow:0 -28px 70px #000d;
+  }
+
+  .playerStatsHead{
+    grid-template-columns:44px 1fr 42px;
+    padding:16px 18px;
+  }
+
+  .playerStatsHead h2{
+    font-size:24px;
+  }
+
+  .playerStatsSummary{
+    margin:16px 18px;
+  }
+
+  .playerStatsDrawer .playerHistory{
+    margin:0 18px calc(22px + env(safe-area-inset-bottom));
+  }
+}

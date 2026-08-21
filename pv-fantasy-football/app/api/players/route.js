@@ -1,5 +1,6 @@
 import {NextResponse} from 'next/server';
 import {readSheetRange} from '../../../lib/google-sheets';
+import {publicPlayerDirectory,rowsToRecords} from '../../../lib/participant-experience.mjs';
 import {logServerFailure} from '../../../lib/safe-server-log.mjs';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,6 @@ function slotsFor(position, side) {
     .filter(([, positions]) => positions.includes(position))
     .map(([slot]) => slot);
 
-  // Keep flex eligibility side-safe even if future roster positions are added.
   if (side === 'OFF' && !slots.includes('Offensive Flex') && ['QB','RB','WR','TE'].includes(position)) {
     slots.push('Offensive Flex');
   }
@@ -30,35 +30,51 @@ function slotsFor(position, side) {
   return slots;
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const rows = await readSheetRange('Players!A3:H1000');
-    if (!rows.length) {
-      return NextResponse.json({players: [], status: 'empty_roster'}, {status: 200});
-    }
+    const week = new URL(request.url).searchParams.get('week') || '';
 
-    const [header, ...data] = rows;
-    const index = Object.fromEntries(header.map((name, i) => [name, i]));
+    const [playerRows,scoreRows,gameRows,publishRows] = await Promise.all([
+      readSheetRange("'Players'!A3:H1000"),
+      readSheetRange("'PlayerScores'!A3:V2000"),
+      readSheetRange("'Games'!A3:M100"),
+      readSheetRange("'PublishControl'!A3:N200"),
+    ]);
 
-    const players = data
-      .filter(row => String(row[index['Active']] || '').trim().toUpperCase() === 'YES')
+    const players = rowsToRecords(playerRows)
+      .filter(row => String(row.Active || '').trim().toUpperCase() === 'YES')
       .map(row => {
-        const position = String(row[index['Position']] || '').trim();
-        const side = String(row[index['Side']] || '').trim().toUpperCase();
+        const position = String(row.Position || '').trim();
+        const side = String(row.Side || '').trim().toUpperCase();
+
         return {
-          player_key: String(row[index['Player ID']] || '').trim(),
-          display_name: String(row[index['Player Name']] || '').trim(),
+          player_key: String(row['Player ID'] || '').trim(),
+          display_name: String(row['Player Name'] || '').trim(),
           position,
           side,
-          class_year: String(row[index['Class']] || '').trim(),
-          jersey: String(row[index['Jersey']] || '').trim(),
+          class_year: String(row.Class || '').trim(),
+          jersey: String(row.Jersey || '').trim(),
           eligible_slots: slotsFor(position, side),
         };
       })
-      .filter(p => p.player_key && p.display_name && p.eligible_slots.length > 0);
+      .filter(player => player.player_key && player.display_name && player.eligible_slots.length > 0);
+
+    const publish = rowsToRecords(publishRows);
+    const release = publish.find(row => String(row.Control || '').toUpperCase() === 'OFFICIAL RELEASE');
+
+    const result = publicPlayerDirectory({
+      players,
+      scores: rowsToRecords(scoreRows),
+      games: rowsToRecords(gameRows),
+      releaseStatus: release?.Status || '',
+    }, week);
 
     return NextResponse.json(
-      {players, count: players.length, status: 'live_google_sheets'},
+      {
+        ...result,
+        count: result.players.length,
+        status: result.players.length ? 'live_google_sheets' : 'empty_roster',
+      },
       {headers: {'Cache-Control': 'no-store, max-age=0'}}
     );
   } catch (error) {
