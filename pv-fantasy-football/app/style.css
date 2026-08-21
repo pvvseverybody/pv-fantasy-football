@@ -184,3 +184,128 @@ html{background:#08070d;scroll-behavior:smooth}body{min-width:320px;background:r
   letter-spacing:0;
   color:#fff!important;
 }
+
+/* More navigation menu */
+.moreNav{
+  position:relative;
+  display:flex;
+  align-items:stretch;
+}
+
+.moreNav>button{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  width:auto;
+  min-height:42px;
+  padding:8px 18px;
+  border:0;
+  border-radius:7px;
+  box-shadow:none;
+  background:transparent;
+  color:#c9c3cf;
+  font-family:Arial,sans-serif!important;
+  font-size:13px;
+  text-transform:none;
+  letter-spacing:0;
+}
+
+.moreNav>button:hover{
+  color:var(--gold);
+  background:#28212e;
+  filter:none;
+  transform:none;
+}
+
+.moreNav>button.active{
+  color:var(--gold);
+  background:#2a1b35;
+  box-shadow:inset 0 -2px var(--gold);
+}
+
+.moreNav>button i{
+  display:none;
+  font-style:normal;
+}
+
+.moreMenu{
+  position:absolute;
+  z-index:130;
+  top:calc(100% + 8px);
+  right:0;
+  min-width:190px;
+  padding:6px;
+  border:1px solid #3a3341;
+  border-radius:10px;
+  background:#17141bfa;
+  box-shadow:0 18px 40px #000a;
+  backdrop-filter:blur(14px);
+}
+
+.moreMenu a{
+  display:block;
+  min-height:0;
+  padding:12px 14px;
+  border-radius:7px;
+  color:#eee;
+  font-size:13px;
+  text-align:left;
+}
+
+.moreMenu a:hover{
+  color:var(--gold);
+  background:#2a2230;
+}
+
+@media(max-width:760px){
+  .moreNav{
+    min-width:0;
+  }
+
+  .moreNav>button{
+    flex-direction:column;
+    justify-content:center;
+    gap:3px;
+    width:100%;
+    min-width:0;
+    min-height:55px;
+    padding:5px 2px;
+    border-radius:0;
+    font-size:9px;
+  }
+
+  .moreNav>button i{
+    display:block;
+    color:var(--gold);
+    font-size:18px;
+  }
+
+  .moreNav>button.active{
+    background:transparent;
+    box-shadow:inset 0 2px var(--gold);
+  }
+
+  .moreMenu{
+    top:auto;
+    right:4px;
+    bottom:calc(100% + 10px);
+    width:min(220px,calc(100vw - 20px));
+    min-width:190px;
+  }
+
+  .moreMenu a{
+    display:block;
+    min-height:0;
+    padding:14px;
+    font-size:13px;
+    text-align:left;
+  }
+}
+
+@media(max-width:390px){
+  .moreNav>button{
+    font-size:8px;
+  }
+}
+/* Allow navigation popover to render outside the nav bar */
+.siteNav{overflow:visible}

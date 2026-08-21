@@ -23,7 +23,7 @@ test('rules screen presents certified scoring exclusions and penalties',async()=
 
 test('participant navigation exposes core mobile destinations without admin links',async()=>{
   const navigation=await source('app/components/SiteHeader.js');
-  for(const route of ['/lineup','/results','/leaderboard','/rules'])assert.match(navigation,new RegExp(route.replace('/','\\/')));
+  for(const route of ['/lineup','/results','/leaderboard','/players','/rules'])assert.match(navigation,new RegExp(route.replace('/','\\/')));
   assert.match(navigation,/aria-current/);
   assert.doesNotMatch(navigation,/\/admin/);
 });
