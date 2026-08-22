@@ -667,3 +667,5 @@ html{background:#08070d;scroll-behavior:smooth}body{min-width:320px;background:r
     margin:0 18px calc(22px + env(safe-area-inset-bottom));
   }
 }
+/* Registration form layout polish */
+.identifyCard .registrationForm{grid-template-columns:1fr;align-items:stretch}.registrationForm .termsCheck{align-items:center;padding:14px 16px}.registrationForm .termsCheck span{font-size:13px}
