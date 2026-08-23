@@ -10,7 +10,7 @@ export const WORKBOOK_SCHEMAS=Object.freeze({
   ActiveLineups:['Game ID','Week','Participant ID','Display Name','Active Submission ID','Version','Submitted CT','Kickoff CT','Accepted?','Scoring Version?','Pick Count','Fantasy Score','State','Audit Note'],
   GameStats:['Game ID','Week','Player ID','Player Name','Rush Yds','Rush TD','Receptions','Rec Yds','Rec TD','Pass INT','Fumbles Lost','Tackles','TFL','TFL Yds','Sacks','Sack Yds','QBH','PBU','Def INT','INT Return Yds','Forced Fumble','Fumble Recovery','Def Return TD','Source URL','Imported At','Final?'],
   PlayerScores:['Game ID','Week','Player ID','Player Name','Rush Pts','Rush TD Pts','Rec Pts','Rec Yd Pts','Rec TD Pts','Pass INT Pts','Fum Lost Pts','Tackle Pts','TFL Pts','Sack Pts','QBH Pts','PBU Pts','Def INT Pts','FF Pts','FR Pts','Def Return TD Pts','Neg/Return Yd Pts','TOTAL'],
-  WeeklyScores:['Game ID','Week','Participant ID','Display Name','Fantasy Score','Pick Count','Validation'],
+  WeeklyScores:['Game ID','Week','Participant ID','Display Name','Fantasy Score','Weekly Rank','Pick Count','Validation'],
   Leaderboard:['Rank','Participant ID','Display Name','Total','Avg','Best Week'],
   Reconciliation:['Game ID','Feed Final?','Official Final?','Stat Differences','Unmatched Names','QA Open Critical','Reconciliation Status','Lock Status'],
   PublishControl:['Control','Status'],
