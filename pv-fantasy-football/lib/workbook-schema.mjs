@@ -1,5 +1,5 @@
 export const WORKBOOK_SCHEMAS=Object.freeze({
-  Games:['Week','Game ID','Kickoff (CT)','Opponent','Site','Location','Pick Status','Stats Final?'],
+  Games:['Week','Game ID','Kickoff (CT)','Opponent','Site','Location','Pick Status','Stats Final?','Published At'],
   Players:['Player ID','Player Name','Position','Jersey','Active'],
   Participants:['Participant ID','Display Name','Email','Active','Joined','Notes','Normalized Email','Alternate Email(s)','Identity Status','Duplicate Flag','Canonical Participant ID'],
   ParticipantSession:['Session ID','Participant ID','Display Name','Normalized Email','Created At','Last Seen','Device Token Hash','Status','Current Game','Lineup State','Notes'],
@@ -12,11 +12,12 @@ export const WORKBOOK_SCHEMAS=Object.freeze({
   PlayerScores:['Game ID','Week','Player ID','Player Name','Rush Pts','Rush TD Pts','Rec Pts','Rec Yd Pts','Rec TD Pts','Pass INT Pts','Fum Lost Pts','Tackle Pts','TFL Pts','Sack Pts','QBH Pts','PBU Pts','Def INT Pts','FF Pts','FR Pts','Def Return TD Pts','Neg/Return Yd Pts','TOTAL'],
   WeeklyScores:['Game ID','Week','Participant ID','Display Name','Fantasy Score','Weekly Rank','Pick Count','Validation'],
   Leaderboard:['Rank','Participant ID','Display Name','Total','Avg','Best Week'],
+  PublicLeaderboard:['Game ID','Week','Weekly Rank','Season Rank','Participant','Week Points','Season Points','Average','Best Week','Status','Published At'],
   Reconciliation:['Game ID','Feed Final?','Official Final?','Stat Differences','Unmatched Names','QA Open Critical','Reconciliation Status','Lock Status'],
   PublishControl:['Control','Status'],
 });
 
-export const STRICT_ORDER_SHEETS=new Set(['Participants','ParticipantSession','Lineup Submissions','SubmissionHistory','Picks','Lineups','ActiveLineups','GameStats','PlayerScores']);
+export const STRICT_ORDER_SHEETS=new Set(['Participants','ParticipantSession','Lineup Submissions','SubmissionHistory','Picks','Lineups','ActiveLineups','GameStats','PlayerScores','PublicLeaderboard']);
 
 export function validateSheetHeaders(sheet,actual=[]){
   const expected=WORKBOOK_SCHEMAS[sheet];
