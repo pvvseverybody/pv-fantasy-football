@@ -15,7 +15,7 @@ function publicationError(code, message, details = {}) {
 
 function isDemoRecord(row = {}) {
   return /^DEMO-|^TEST-|^UNIT-/i.test(String(row['Participant ID'] || row['Game ID'] || '')) ||
-    /demo participant/i.test(String(row['Display Name'] || ''));
+    /demo participant/i.test(String(row['Display Name'] || row.Participant || ''));
 }
 
 function weekIndex(week) {
@@ -39,10 +39,86 @@ function rankByPoints(rows, field) {
   });
 }
 
+function authoritativeRows(weekly, targetGameId) {
+  const valid = weekly.filter(row =>
+    row &&
+    String(row['Game ID']) === targetGameId &&
+    upper(row.Validation) === 'VALID' &&
+    row['Participant ID'] &&
+    row['Display Name'] &&
+    !isDemoRecord(row)
+  );
+
+  const keys = new Set();
+  const names = new Set();
+
+  for (const row of valid) {
+    const participantId = String(row['Participant ID']);
+    const participant = String(row['Display Name']).trim();
+    const key = `${targetGameId}\n${participantId}`;
+    const normalizedName = participant.toLowerCase();
+
+    if (keys.has(key) || names.has(normalizedName)) {
+      throw publicationError(
+        'DUPLICATE_WEEKLY_SCORE',
+        'WeeklyScores contains more than one valid row for the same published participant.',
+        {gameId: targetGameId, participantId}
+      );
+    }
+
+    keys.add(key);
+    names.add(normalizedName);
+  }
+
+  return valid.map(row => ({
+    gameId: targetGameId,
+    week: String(row.Week || ''),
+    participant: String(row['Display Name']).trim(),
+    score: round(number(row['Fantasy Score'])),
+    weeklyRank: row['Weekly Rank'] === '' ? '' : number(row['Weekly Rank']),
+  }));
+}
+
+function frozenRows(publicRows, gameId) {
+  const rows = publicRows.filter(row =>
+    row &&
+    String(row['Game ID']) === gameId &&
+    row.Participant &&
+    !isDemoRecord(row)
+  );
+
+  const names = new Set();
+
+  for (const row of rows) {
+    const participant = String(row.Participant).trim();
+    const normalizedName = participant.toLowerCase();
+
+    if (names.has(normalizedName)) {
+      throw publicationError(
+        'DUPLICATE_PUBLIC_SNAPSHOT',
+        'PublicLeaderboard contains more than one frozen row for the same game and participant.',
+        {gameId, participant}
+      );
+    }
+
+    names.add(normalizedName);
+  }
+
+  return rows.map(row => ({
+    gameId,
+    week: String(row.Week || ''),
+    participant: String(row.Participant).trim(),
+    score: round(number(row['Week Points'])),
+    weeklyRank: row['Weekly Rank'] === '' ? '' : number(row['Weekly Rank']),
+  }));
+}
+
 export function buildPublicationSnapshots({
   games = [],
   weekly = [],
+  publicRows = [],
   publicationGameIds = [],
+  targetGameId = '',
   publishedAtByGame = {},
 } = {}) {
   const gameById = new Map(
@@ -66,25 +142,42 @@ export function buildPublicationSnapshots({
     String(a['Game ID']).localeCompare(String(b['Game ID']))
   );
 
-  const validWeekly = weekly.filter(row =>
-    row &&
-    upper(row.Validation) === 'VALID' &&
-    row['Participant ID'] &&
-    !isDemoRecord(row)
+  const target = String(
+    targetGameId ||
+    publicationGames.at(-1)?.['Game ID'] ||
+    ''
   );
 
-  const weeklyKey = new Set();
-  for (const row of validWeekly) {
-    const key = `${row['Game ID']}\n${row['Participant ID']}`;
-    if (weeklyKey.has(key)) {
-      throw publicationError(
-        'DUPLICATE_WEEKLY_SCORE',
-        'WeeklyScores contains more than one valid row for the same game and participant.',
-        {gameId: row['Game ID'], participantId: row['Participant ID']}
-      );
-    }
-    weeklyKey.add(key);
+  if (!target || !publicationGames.some(game => String(game['Game ID']) === target)) {
+    throw publicationError(
+      'INVALID_PUBLICATION_TARGET',
+      'The publication target must be one of the publication games.',
+      {gameId: target}
+    );
   }
+
+  const sourceByGame = new Map();
+
+  for (const game of publicationGames) {
+    const gameId = String(game['Game ID']);
+    sourceByGame.set(
+      gameId,
+      gameId === target
+        ? authoritativeRows(weekly, target)
+        : frozenRows(publicRows, gameId)
+    );
+  }
+
+  const publishedAt = gameId => {
+    if (publishedAtByGame[gameId]) return String(publishedAtByGame[gameId]);
+
+    const frozen = publicRows.find(row =>
+      String(row['Game ID']) === gameId &&
+      row['Published At']
+    );
+
+    return String(frozen?.['Published At'] || '');
+  };
 
   const output = [];
 
@@ -93,39 +186,50 @@ export function buildPublicationSnapshots({
     const snapshotGameId = String(snapshotGame['Game ID']);
     const snapshotWeek = String(snapshotGame.Week || '');
     const includedGames = publicationGames.slice(0, snapshotIndex + 1);
-    const includedIds = new Set(includedGames.map(game => String(game['Game ID'])));
-    const publishedGameCount = includedGames.length;
 
-    const cumulativeRows = validWeekly.filter(row => includedIds.has(String(row['Game ID'])));
-    const participantIds = [...new Set(cumulativeRows.map(row => String(row['Participant ID'])))];
+    const participantNames = [...new Set(
+      includedGames.flatMap(game =>
+        (sourceByGame.get(String(game['Game ID'])) || []).map(row => row.participant)
+      )
+    )];
 
-    let snapshotRows = participantIds.map(participantId => {
-      const participantRows = cumulativeRows.filter(row => String(row['Participant ID']) === participantId);
-      const current = participantRows.find(row => String(row['Game ID']) === snapshotGameId) || null;
-      const latest = [...participantRows].sort((a, b) =>
-        weekIndex(b.Week) - weekIndex(a.Week)
-      )[0];
+    let snapshotRows = participantNames.map(participant => {
+      const participantRows = includedGames.map(game => {
+        const gameId = String(game['Game ID']);
+        const row = (sourceByGame.get(gameId) || []).find(item => item.participant === participant);
 
-      const seasonPoints = round(participantRows.reduce((sum, row) => sum + number(row['Fantasy Score']), 0));
-      const average = publishedGameCount ? round(seasonPoints / publishedGameCount) : 0;
+        return row || {
+          gameId,
+          week: String(game.Week || ''),
+          participant,
+          score: 0,
+          weeklyRank: '',
+        };
+      });
+
+      const current = participantRows.find(row => row.gameId === snapshotGameId);
+      const seasonPoints = round(participantRows.reduce((sum, row) => sum + row.score, 0));
+      const average = includedGames.length
+        ? round(seasonPoints / includedGames.length)
+        : 0;
 
       const best = [...participantRows].sort((a, b) =>
-        number(b['Fantasy Score']) - number(a['Fantasy Score']) ||
-        weekIndex(a.Week) - weekIndex(b.Week)
+        b.score - a.score ||
+        weekIndex(a.week) - weekIndex(b.week)
       )[0];
 
       return {
         'Game ID': snapshotGameId,
         Week: snapshotWeek,
-        'Weekly Rank': current ? number(current['Weekly Rank']) : '',
+        'Weekly Rank': current?.weeklyRank ?? '',
         'Season Rank': '',
-        Participant: latest?.['Display Name'] || '',
-        'Week Points': current ? round(number(current['Fantasy Score'])) : 0,
+        Participant: participant,
+        'Week Points': current?.score ?? 0,
         'Season Points': seasonPoints,
         Average: average,
-        'Best Week': best?.Week || '',
-        Status: 'FINAL • OFFICIAL',
-        'Published At': String(publishedAtByGame[snapshotGameId] || ''),
+        'Best Week': best?.week || '',
+        Status: 'FINAL \u2022 OFFICIAL',
+        'Published At': publishedAt(snapshotGameId),
       };
     });
 
