@@ -33,19 +33,20 @@ test('submission outcomes distinguish all authoritative participant states',()=>
 });
 
 test('public leaderboard excludes demo data and ranks valid weekly scores once entry is locked',()=>{
-  const result=publicLeaderboard({games:[{Week:'W1','Pick Status':'LOCKED'}],weekly:[{'Participant ID':'DEMO-1','Display Name':'Demo Participant',Week:'W1','Fantasy Score':99,Validation:'VALID'},{'Participant ID':'P1','Display Name':'Panther One',Week:'W1','Fantasy Score':18,Validation:'VALID'},{'Participant ID':'P2','Display Name':'Panther Two',Week:'W1','Fantasy Score':24,Validation:'VALID'}],leaderboard:[{Rank:1,'Participant ID':'P2','Display Name':'Panther Two',Total:24,Avg:24,'Best Week':24}]});
+  const result=publicLeaderboard({games:[{Week:'W1','Pick Status':'LOCKED'}],weekly:[{'Participant ID':'DEMO-1','Display Name':'Demo Participant',Week:'W1','Fantasy Score':99,Validation:'VALID'},{'Participant ID':'P1','Display Name':'Panther One',Week:'W1','Fantasy Score':18,Validation:'VALID'},{'Participant ID':'P2','Display Name':'Panther Two',Week:'W1','Fantasy Score':24,Validation:'VALID'}],leaderboard:[{Rank:1,'Participant ID':'P2','Display Name':'Panther Two',Total:24,Avg:24,'Best Week':'W1'}]});
   assert.deepEqual(result.weekly.map(row=>row.participant),['Panther Two','Panther One']);
   assert.equal(result.cumulative.length,1);
+  assert.equal(result.cumulative[0].best_week,'W1');
 });
 
 test('public leaderboard hides the current open week before scoring begins',()=>{
-  const result=publicLeaderboard({games:[{Week:'W0','Pick Status':'OPEN'}],weekly:[{'Participant ID':'P1','Display Name':'Panther One',Week:'W0','Fantasy Score':0,Validation:'VALID'}],leaderboard:[{Rank:1,'Participant ID':'P1','Display Name':'Panther One',Total:0,Avg:0,'Best Week':0}]});
+  const result=publicLeaderboard({games:[{Week:'W0','Pick Status':'OPEN'}],weekly:[{'Participant ID':'P1','Display Name':'Panther One',Week:'W0','Fantasy Score':0,Validation:'VALID'}],leaderboard:[{Rank:1,'Participant ID':'P1','Display Name':'Panther One',Total:0,Avg:0,'Best Week':''}]});
   assert.deepEqual(result.weekly,[]);
   assert.deepEqual(result.cumulative,[]);
 });
 
 test('public leaderboard preserves prior season totals while a later week is open',()=>{
-  const result=publicLeaderboard({games:[{Week:'W0','Pick Status':'LOCKED'},{Week:'W1','Pick Status':'OPEN'}],weekly:[{'Participant ID':'P1','Display Name':'Panther One',Week:'W0','Fantasy Score':18,Validation:'VALID'},{'Participant ID':'P1','Display Name':'Panther One',Week:'W1','Fantasy Score':0,Validation:'VALID'}],leaderboard:[{Rank:1,'Participant ID':'P1','Display Name':'Panther One',Total:18,Avg:18,'Best Week':18}]});
+  const result=publicLeaderboard({games:[{Week:'W0','Pick Status':'LOCKED'},{Week:'W1','Pick Status':'OPEN'}],weekly:[{'Participant ID':'P1','Display Name':'Panther One',Week:'W0','Fantasy Score':18,Validation:'VALID'},{'Participant ID':'P1','Display Name':'Panther One',Week:'W1','Fantasy Score':0,Validation:'VALID'}],leaderboard:[{Rank:1,'Participant ID':'P1','Display Name':'Panther One',Total:18,Avg:18,'Best Week':'W0'}]});
   assert.deepEqual(result.weekly,[]);
   assert.deepEqual(result.cumulative.map(row=>row.participant),['Panther One']);
 });
