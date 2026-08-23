@@ -9,6 +9,8 @@ const opponent=row=>first(row,['Opponent','Opponent Name','PV Opponent','Game Op
 const week=row=>first(row,['Week','Game Week']);
 const kickoff=row=>first(row,['Kickoff (CT)','Kickoff CT','Kickoff','Scheduled Kickoff']);
 const providerEvent=row=>first(row,['Provider Event ID','Provider Game ID','Event ID','Provider ID']);
+const nonProductionControlId=value=>/^(CERT|SYSTEM)(-|_|\b)/.test(upper(value));
+const placeholderProviderEvent=value=>['TBD','TBA'].includes(upper(value));
 const pickStatus=row=>upper(first(row,['Pick Status','Entry Status','Lineup Status']));
 const participantId=row=>first(row,['Participant ID','ParticipantID']);
 const participantEmail=row=>upper(first(row,['Email','Email Address','Normalized Email']));
@@ -47,6 +49,7 @@ export function evaluateSeasonLaunchPreflight(tables={}){
   for(const tableName of controlTables){
     for(const row of tables[tableName]||[]){
       const id=gameId(row);if(!id)continue;
+      if(nonProductionControlId(id))continue;
       const game=gameById.get(id);
       if(!game){add('ORPHAN_CONTROL_GAME_ID','BLOCKED',`${tableName} references ${id}, which is absent from Games.`,{table:tableName,game_id:id});continue;}
       const comparisons=[['opponent',opponent(row),opponent(game)],['week',week(row),week(game)],['kickoff',kickoff(row),kickoff(game)]];
@@ -54,7 +57,7 @@ export function evaluateSeasonLaunchPreflight(tables={}){
         if(actual&&expected&&norm(actual)!==norm(expected))add('GAME_IDENTITY_DRIFT','BLOCKED',`${tableName} ${id} has ${field} “${actual}” but Games has “${expected}”.`,{table:tableName,game_id:id,field});
       }
       const event=providerEvent(row);
-      if(event){
+      if(event&&!placeholderProviderEvent(event)){
         const owner=providerOwners.get(norm(event));
         if(owner&&owner.game_id!==id)add('DUPLICATE_PROVIDER_EVENT_ID','BLOCKED',`Provider event ${event} is assigned to both ${owner.game_id} and ${id}.`,{table:tableName,game_id:id,provider_event_id:event});
         else providerOwners.set(norm(event),{game_id:id,table:tableName});

@@ -66,3 +66,37 @@ test('empty backend state fails closed',()=>{
   assert.equal(result.status,'BLOCKED');
   assert.ok(result.active_blockers.includes('NO_ACTIVE_ELIGIBLE_PLAYERS'));
 });
+
+test('certification control rows are ignored as non-production game identities',()=>{
+  const tables=baseTables();
+  tables.FeedControl.push({'Game ID':'CERT-AUG27','Provider Event ID':'TBD'});
+  tables.RunnerState.push({'Game ID':'CERT-AUG27'});
+  tables.Reconciliation.push({'Game ID':'CERT-AUG27'});
+  const result=evaluateSeasonLaunchPreflight(tables);
+  assert.ok(!result.diagnostics.some(item=>item.code==='ORPHAN_CONTROL_GAME_ID'&&item.game_id==='CERT-AUG27'));
+});
+
+test('system reconciliation rows are ignored as non-production game identities',()=>{
+  const tables=baseTables();
+  tables.Reconciliation.push({'Game ID':'SYSTEM-RULE'});
+  const result=evaluateSeasonLaunchPreflight(tables);
+  assert.ok(!result.diagnostics.some(item=>item.code==='ORPHAN_CONTROL_GAME_ID'&&item.game_id==='SYSTEM-RULE'));
+});
+
+test('placeholder provider event IDs do not count as duplicate provider identities',()=>{
+  const tables=baseTables();
+  tables.Games.push({'Game ID':'2026-W1',Week:'W1',Opponent:'Texas Southern','Pick Status':'PENDING'});
+  tables.Games.push({'Game ID':'2026-W2',Week:'W2',Opponent:'Baylor','Pick Status':'PENDING'});
+  tables.FeedControl.push({'Game ID':'2026-W1','Provider Event ID':'TBD'});
+  tables.FeedControl.push({'Game ID':'2026-W2','Provider Event ID':'TBD'});
+  const result=evaluateSeasonLaunchPreflight(tables);
+  assert.ok(!result.active_blockers.includes('DUPLICATE_PROVIDER_EVENT_ID'));
+});
+
+test('real duplicate provider event IDs still block launch',()=>{
+  const tables=baseTables();
+  tables.Games.push({'Game ID':'2026-W1',Week:'W1',Opponent:'Texas Southern','Pick Status':'PENDING'});
+  tables.FeedControl.push({'Game ID':'2026-W1','Provider Event ID':'TARLETON-2026-W0'});
+  const result=evaluateSeasonLaunchPreflight(tables);
+  assert.ok(result.active_blockers.includes('DUPLICATE_PROVIDER_EVENT_ID'));
+});
