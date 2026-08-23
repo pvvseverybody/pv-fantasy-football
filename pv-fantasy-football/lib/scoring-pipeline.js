@@ -4,6 +4,7 @@ import {
   getSpreadsheetMetadata,
   readSheetRange,
 } from './google-sheets';
+import {withGameWriterGate} from './workbook-writer-gate.mjs';
 
 const GAME_STATS_HEADERS = [
   'Game ID', 'Week', 'Player ID', 'Player Name', 'Rush Yds', 'Rush TD',
@@ -19,8 +20,6 @@ const PLAYER_SCORE_HEADERS = [
   'Tackle Pts', 'TFL Pts', 'Sack Pts', 'QBH Pts', 'PBU Pts', 'Def INT Pts',
   'FF Pts', 'FR Pts', 'Def Return TD Pts', 'Neg/Return Yd Pts', 'TOTAL',
 ];
-
-const writerGates = new Map();
 
 const EXPECTED_SETTING_VALUES = [
   SCORING_RULES.rushingTouchdown, SCORING_RULES.rushingYard,
@@ -92,19 +91,6 @@ function playerScoreRow(row, score) {
   ];
 }
 
-async function withWriterGate(gameId, work) {
-  const previous = writerGates.get(gameId) || Promise.resolve();
-  let release;
-  const current = new Promise(resolve => { release = resolve; });
-  writerGates.set(gameId, current);
-  await previous;
-  try {
-    return await work();
-  } finally {
-    release();
-    if (writerGates.get(gameId) === current) writerGates.delete(gameId);
-  }
-}
 
 function scoreRows(gameId, rows) {
   const seen = new Set();
@@ -263,7 +249,7 @@ export async function scoreGame(gameId) {
   const normalizedGameId = String(gameId || '').trim();
   if (!normalizedGameId) throw scoringError('INVALID_GAME', 'game_id is required.');
 
-  return withWriterGate(normalizedGameId, async () => {
+  return withGameWriterGate(normalizedGameId, async () => {
     const [gameStats, playerScores, picks, settings, metadata] = await Promise.all([
       readSheetRange("'GameStats'!A3:Z1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
       readSheetRange("'PlayerScores'!A3:V1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
