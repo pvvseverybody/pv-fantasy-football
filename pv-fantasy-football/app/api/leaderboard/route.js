@@ -1,15 +1,48 @@
 import {NextResponse} from 'next/server';
 import {readSheetRange} from '../../../lib/google-sheets';
-import {publicLeaderboard,rowsToRecords} from '../../../lib/participant-experience.mjs';
+import {rowsToRecords} from '../../../lib/participant-experience.mjs';
+import {publicLeaderboardFromSnapshots} from '../../../lib/public-leaderboard-snapshot.mjs';
 import {logServerFailure} from '../../../lib/safe-server-log.mjs';
 
-export const dynamic='force-dynamic';
-export async function GET(request){
-  try{
-    const week=new URL(request.url).searchParams.get('week')||'';
-    const [weekly,leaderboard,games,publish]=await Promise.all([readSheetRange("'WeeklyScores'!A3:H1000"),readSheetRange("'Leaderboard'!A3:T1000"),readSheetRange("'Games'!A3:M100"),readSheetRange("'PublishControl'!A3:N200")]);
-    const release=rowsToRecords(publish).find(row=>String(row.Control).toUpperCase()==='OFFICIAL RELEASE');
-    const result=publicLeaderboard({weekly:rowsToRecords(weekly),leaderboard:rowsToRecords(leaderboard),games:rowsToRecords(games),releaseStatus:release?.Status||''},week);
-    return NextResponse.json({...result,status:result.weekly.length||result.cumulative.length?'available':'awaiting_results'},{headers:{'Cache-Control':'no-store'}});
-  }catch(error){logServerFailure('leaderboard',error);return NextResponse.json({weekly:[],cumulative:[],status:'backend_error',message:'Standings are temporarily unavailable.'},{status:500});}
+export const dynamic = 'force-dynamic';
+
+export async function GET(request) {
+  try {
+    const week = new URL(request.url).searchParams.get('week') || '';
+
+    const publicMatrix = await readSheetRange(
+      "'PublicLeaderboard'!A3:K",
+      {valueRenderOption:'UNFORMATTED_VALUE'}
+    );
+
+    const result = publicLeaderboardFromSnapshots(
+      rowsToRecords(publicMatrix),
+      week
+    );
+
+    return NextResponse.json(
+      {
+        ...result,
+        status:result.weekly.length || result.cumulative.length
+          ? 'available'
+          : 'awaiting_results',
+      },
+      {headers:{'Cache-Control':'no-store'}}
+    );
+  } catch (error) {
+    logServerFailure('leaderboard', error);
+
+    return NextResponse.json(
+      {
+        weekly:[],
+        cumulative:[],
+        status:'backend_error',
+        message:'Standings are temporarily unavailable.',
+      },
+      {
+        status:500,
+        headers:{'Cache-Control':'no-store'},
+      }
+    );
+  }
 }
