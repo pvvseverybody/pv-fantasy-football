@@ -2,7 +2,7 @@ export const WORKBOOK_SCHEMAS=Object.freeze({
   Games:['Week','Game ID','Kickoff (CT)','Opponent','Site','Location','Pick Status','Stats Final?'],
   Players:['Player ID','Player Name','Position','Jersey','Active'],
   Participants:['Participant ID','Display Name','Email','Active','Joined','Notes','Normalized Email','Alternate Email(s)','Identity Status','Duplicate Flag','Canonical Participant ID'],
-  ParticipantSession:['Session ID','Participant ID','Display Name','Normalized Email','Created At','Last Seen At','Device Token Hash','Status','Current Game','Lineup State','Notes'],
+  ParticipantSession:['Session ID','Participant ID','Display Name','Normalized Email','Created At','Last Seen','Device Token Hash','Status','Current Game','Lineup State','Notes'],
   'Lineup Submissions':['Submission ID','Submitted At','Email','Game ID','RB','WR','TE','Offensive Flex','DL','LB','DB','Defensive Flex'],
   SubmissionHistory:['Submission ID','Game ID','Participant ID','Version','Submitted CT','Status','Supersedes','Superseded By','Scoring Version?','Lineup ID','Pick Count','Valid Picks','On Time?','Validation Message','Writer Result','Notes'],
   Picks:['Pick ID','Game ID','Week','Participant ID','Slot ID','Player ID','Player Name','Submitted At','Locked?','Valid?','Fantasy Points','Submission ID','Version','Scoring Version?','Submission State'],
