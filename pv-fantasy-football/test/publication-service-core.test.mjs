@@ -6,8 +6,8 @@ import {PUBLIC_LEADERBOARD_HEADERS} from '../lib/publication-write-plan.mjs';
 const NOW = '2026-08-30T05:00:00.000Z';
 
 const gamesHeaders = [
-  'Game ID',
   'Week',
+  'Game ID',
   'Kickoff (CT)',
   'Opponent',
   'Home/Away',
@@ -28,8 +28,8 @@ function gameRow({
   publishedAt='',
 } = {}) {
   return [
-    id,
     week,
+    id,
     '8/29/2026 8:00 PM',
     'Tarleton State',
     'AWAY',

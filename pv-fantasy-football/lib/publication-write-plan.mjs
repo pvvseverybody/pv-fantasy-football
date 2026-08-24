@@ -13,7 +13,6 @@ export const PUBLIC_LEADERBOARD_HEADERS = Object.freeze([
 ]);
 
 const PUBLIC_DATA_START_ROW_INDEX = 3;
-const GAMES_PUBLISHED_AT_COLUMN_INDEX = 11;
 
 function planError(code, message, details = {}) {
   const error = new Error(message);
@@ -97,6 +96,7 @@ export function buildPublicationWritePlan({
   publicSheetId,
   gamesSheetId,
   gamesRowNumber,
+  gamesPublishedAtColumnIndex,
   currentPublicGridRowCount,
   existingPublicDataRowCount,
   snapshotRows,
@@ -113,6 +113,14 @@ export function buildPublicationWritePlan({
     throw planError(
       'PUBLICATION_GAME_ROW_INVALID',
       'The target Games row must be row 4 or later.'
+    );
+  }
+
+  if (!Number.isInteger(gamesPublishedAtColumnIndex) ||
+      gamesPublishedAtColumnIndex < 0) {
+    throw planError(
+      'PUBLICATION_GAME_COLUMN_INVALID',
+      'The Games Published At column index is required.'
     );
   }
 
@@ -189,8 +197,8 @@ export function buildPublicationWritePlan({
         sheetId:gamesSheetId,
         startRowIndex:gamesRowNumber - 1,
         endRowIndex:gamesRowNumber,
-        startColumnIndex:GAMES_PUBLISHED_AT_COLUMN_INDEX,
-        endColumnIndex:GAMES_PUBLISHED_AT_COLUMN_INDEX + 1,
+        startColumnIndex:gamesPublishedAtColumnIndex,
+        endColumnIndex:gamesPublishedAtColumnIndex + 1,
       },
       rows:[rowData([publishedAtText])],
       fields:'userEnteredValue',

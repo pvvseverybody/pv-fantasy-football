@@ -43,21 +43,25 @@ function assertPublicHeaders(matrix) {
 
 function findRawGame(matrix, gameId) {
   const headers = matrix[0] || [];
+  const gameIdColumnIndex = headers.indexOf('Game ID');
+  const publishedAtColumnIndex = headers.indexOf('Published At');
 
-  if (headers[0] !== 'Game ID' || headers[11] !== 'Published At') {
+  if (gameIdColumnIndex === -1 || publishedAtColumnIndex === -1) {
     throw publicationError(
       'PUBLICATION_SCHEMA_MISMATCH',
-      'Games must have Game ID in column A and Published At in column L.'
+      'Games must contain Game ID and Published At columns.'
     );
   }
 
   const matches = [];
 
   matrix.slice(1).forEach((row, index) => {
-    if (String(row[0] || '') === gameId) {
+    if (String(row[gameIdColumnIndex] || '') === gameId) {
       matches.push({
         row,
         rowNumber:index + 4,
+        gameIdColumnIndex,
+        publishedAtColumnIndex,
       });
     }
   });
@@ -379,6 +383,7 @@ export async function publishGameWithDeps(
       publicSheetId:publicSheet.sheetId,
       gamesSheetId:gamesSheet.sheetId,
       gamesRowNumber:rawTargetGame.rowNumber,
+      gamesPublishedAtColumnIndex:rawTargetGame.publishedAtColumnIndex,
       currentPublicGridRowCount:Number(
         publicSheet.gridProperties?.rowCount || 0
       ),
@@ -413,14 +418,14 @@ export async function publishGameWithDeps(
       normalizedGameId
     );
 
-    if (String(verifiedTarget.row[11] || '') !== publishedAt) {
+    if (String(verifiedTarget.row[verifiedTarget.publishedAtColumnIndex] || '') !== publishedAt) {
       throw publicationError(
         'PUBLICATION_VERIFICATION_FAILED',
         'Games.Published At did not verify after the publication batch.',
         {
           gameId:normalizedGameId,
           expected:publishedAt,
-          actual:verifiedTarget.row[11] || '',
+          actual:verifiedTarget.row[verifiedTarget.publishedAtColumnIndex] || '',
         }
       );
     }
