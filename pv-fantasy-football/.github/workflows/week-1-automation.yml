@@ -1,0 +1,30 @@
+name: Week 1 Fantasy Automation
+
+on:
+  schedule:
+    - cron: '*/5 * * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: pv-fantasy-week-1
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run guarded Week 1 pipeline
+        run: |
+          set -euo pipefail
+          token=$(curl --fail-with-body --silent --show-error \
+            --header "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=pv-fantasy-week-1" | jq -r .value)
+          response=$(curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer ${token}" \
+            https://fantasy.pvvseverybody.com/api/automation/week-1)
+          printf '%s\n' "$response"
