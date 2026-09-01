@@ -11,7 +11,7 @@ test('Week 1 automation route is bearer protected and fixed to the authoritative
 });
 
 test('Week 1 scheduled workflow uses the protected production endpoint',async()=>{
-  const source=await readFile(new URL('../.github/workflows/week-1-automation.yml',import.meta.url),'utf8');
+  const source=await readFile(new URL('../../.github/workflows/week-1-automation.yml',import.meta.url),'utf8');
   assert.match(source,/id-token: write/);
   assert.match(source,/ACTIONS_ID_TOKEN_REQUEST_URL/);
   assert.match(source,/Authorization: Bearer/);
