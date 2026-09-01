@@ -72,6 +72,14 @@ test('participant results do not reveal picks while entry remains open',()=>{
   assert.deepEqual(participantResults(fixture,'one@example.com').lineups,[]);
 });
 
+test('participant results use the frozen public snapshot for official score and status',()=>{
+  const fixture={participants:[{'Participant ID':'PART-1','Display Name':'Panther One',Email:'one@example.com',Active:'YES','Identity Status':'VERIFIED'}],active:[{'Game ID':'G0',Week:'W0','Participant ID':'PART-1','Active Submission ID':'SUB1','Accepted?':'YES','Scoring Version?':'YES','Fantasy Score':0}],picks:[{'Submission ID':'SUB1','Player ID':'P1','Slot ID':'RB','Valid?':'NO','Scoring Version?':'YES','Submission State':'ACCEPTED','Fantasy Points':0}],scores:[{'Game ID':'G0','Player ID':'P1',TOTAL:12}],games:[{'Game ID':'G0','Pick Status':'LOCKED','Stats Final?':'YES'}],players:[{'Player ID':'P1','Player Name':'Current Player',Position:'RB'}],publicSnapshots:[{'Game ID':'G0',Participant:'Panther One','Week Points':34.9,Status:'FINAL • OFFICIAL'}],releaseStatus:'HOLD'};
+  const result=participantResults(fixture,'one@example.com');
+  assert.equal(result.lineups[0].score,34.9);
+  assert.equal(result.lineups[0].status_label,'FINAL • OFFICIAL');
+  assert.equal(result.lineups[0].players.length,1);
+});
+
 test('public player directory hides fantasy production before the current week locks',()=>{
   const result=publicPlayerDirectory({
     games:[{'Game ID':'G0',Week:'W0','Pick Status':'OPEN'}],

@@ -51,6 +51,7 @@ test('public leaderboard renders weekly and cumulative standings from one frozen
 
   assert.equal(result.week,'W0');
   assert.equal(result.status_label,'FINAL \u2022 OFFICIAL');
+  assert.deepEqual(result.available_weeks,['W0']);
 
   assert.deepEqual(result.weekly,[
     {rank:1,participant:'Panther Two',points:30},
@@ -96,6 +97,7 @@ test('default view selects the latest published week, not a future unpublished w
   ]);
 
   assert.equal(result.week,'W1');
+  assert.deepEqual(result.available_weeks,['W0','W1']);
   assert.equal(result.weekly[0].points,20);
   assert.equal(result.cumulative[0].season_points,30);
 });

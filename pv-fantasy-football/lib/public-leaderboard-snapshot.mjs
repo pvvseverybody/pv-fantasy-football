@@ -101,6 +101,7 @@ export function publicLeaderboardFromSnapshots(
   if (!publishedRows.length) {
     return {
       week:requested,
+      available_weeks:[],
       status_label:'AWAITING OFFICIAL RESULTS',
       weekly:[],
       cumulative:[],
@@ -122,6 +123,7 @@ export function publicLeaderboardFromSnapshots(
   if (!selectedRows.length) {
     return {
       week:selectedWeek,
+      available_weeks:availableWeeks,
       status_label:'AWAITING OFFICIAL RESULTS',
       weekly:[],
       cumulative:[],
@@ -157,6 +159,7 @@ export function publicLeaderboardFromSnapshots(
 
   return {
     week:selectedWeek,
+    available_weeks:availableWeeks,
     status_label:String(selectedRows[0].Status || 'FINAL \u2022 OFFICIAL'),
     weekly,
     cumulative,

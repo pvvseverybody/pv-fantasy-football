@@ -135,7 +135,7 @@ export function publicPlayerDirectory({players=[],scores=[],games=[],releaseStat
     })
   };
 }
-export function participantResults({participants=[],active=[],picks=[],scores=[],weekly=[],games=[],players=[],releaseStatus=''}, email) {
+export function participantResults({participants=[],active=[],picks=[],scores=[],weekly=[],games=[],players=[],publicSnapshots=[],releaseStatus=''}, email) {
   const normalized=String(email||'').trim().toLowerCase();
   const participant=participants.find(row=>!isDemoRecord(row)&&String(row.Active).toUpperCase()==='YES'&&String(row['Identity Status']).toUpperCase()==='VERIFIED'&&[row['Normalized Email'],row.Email].some(value=>String(value||'').trim().toLowerCase()===normalized));
   if(!participant)return null;
@@ -143,10 +143,12 @@ export function participantResults({participants=[],active=[],picks=[],scores=[]
   const scoreMap=new Map(scores.map(row=>[`${row['Game ID']}|${row['Player ID']}`,number(row.TOTAL)]));
   const gameMap=new Map(games.map(row=>[row['Game ID'],row]));
   const weekMap=new Map(weekly.filter(row=>row['Participant ID']===participant['Participant ID']&&String(row.Validation).toUpperCase()==='VALID').map(row=>[row['Game ID'],row]));
+  const publishedMap=new Map(publicSnapshots.filter(row=>String(row.Participant||'').trim().toLowerCase()===String(participant['Display Name']||'').trim().toLowerCase()&&String(row.Status||'').trim().toUpperCase()==='FINAL • OFFICIAL').map(row=>[row['Game ID'],row]));
   const lineups=active.filter(row=>row['Participant ID']===participant['Participant ID']&&String(row['Accepted?']).toUpperCase()==='YES'&&String(row['Scoring Version?']).toUpperCase()==='YES'&&String(gameMap.get(row['Game ID'])?.['Pick Status']||'LOCKED').toUpperCase()!=='OPEN').map(lineup=>{
     const game=gameMap.get(lineup['Game ID'])||{};const submission=lineup['Active Submission ID'];
-    const selected=picks.filter(row=>row['Submission ID']===submission&&String(row['Valid?']).toUpperCase()==='YES'&&String(row['Scoring Version?']).toUpperCase()==='YES'&&String(row['Submission State']).toUpperCase()==='ACCEPTED').map(row=>{const player=playerMap.get(row['Player ID'])||{};return{slot:row['Slot ID'],player_key:row['Player ID'],name:player['Player Name']||row['Player Name']||'',position:player.Position||'',jersey:player.Jersey||'',points:scoreMap.get(`${lineup['Game ID']}|${row['Player ID']}`)??number(row['Fantasy Points'])};});
-    return{game_id:lineup['Game ID'],week:lineup.Week,opponent:game.Opponent||'',kickoff_ct:game['Kickoff (CT)']||'',status_label:participantStatusLabel(game,releaseStatus),score:number(weekMap.get(lineup['Game ID'])?.['Fantasy Score']??lineup['Fantasy Score']),players:selected};
+    const selected=picks.filter(row=>row['Submission ID']===submission&&String(row['Scoring Version?']).toUpperCase()==='YES'&&String(row['Submission State']).toUpperCase()==='ACCEPTED').map(row=>{const player=playerMap.get(row['Player ID'])||{};return{slot:row['Slot ID'],player_key:row['Player ID'],name:player['Player Name']||row['Player Name']||'',position:player.Position||'',jersey:player.Jersey||'',points:scoreMap.get(`${lineup['Game ID']}|${row['Player ID']}`)??number(row['Fantasy Points'])};});
+    const published=publishedMap.get(lineup['Game ID']);
+    return{game_id:lineup['Game ID'],week:lineup.Week,opponent:game.Opponent||'',kickoff_ct:game['Kickoff (CT)']||'',status_label:published?.Status||participantStatusLabel(game,releaseStatus),score:number(published?.['Week Points']??weekMap.get(lineup['Game ID'])?.['Fantasy Score']??lineup['Fantasy Score']),players:selected};
   }).sort((a,b)=>String(b.week).localeCompare(String(a.week),undefined,{numeric:true}));
   return{display_name:participant['Display Name'],lineups};
 }
