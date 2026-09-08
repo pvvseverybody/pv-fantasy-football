@@ -29,6 +29,12 @@ test('uses position-compatible jersey fallback for known ESPN misattribution pat
   assert.ok(result.rows.every(row=>row[25]==='NO'));
 });
 
+test('marks normalized rows final when ESPN reports the game complete',()=>{
+  const result=normalizeEspnPvStats(payload,{players,gameId:'2026-W1',week:'W1',sourceUrl:'espn',importedAt:'now',final:true});
+  assert.equal(result.valid,true);
+  assert.ok(result.rows.every(row=>row[25]==='YES'));
+});
+
 test('ignores athletes outside the approved fantasy pool without inventing an identity',()=>{
   const changed=structuredClone(payload);changed.boxscore.players[0].statistics[0].athletes[0].athlete={displayName:'Unknown Runner',jersey:'99'};
   const result=normalizeEspnPvStats(changed,{players,gameId:'2026-W1',week:'W1',sourceUrl:'espn'});

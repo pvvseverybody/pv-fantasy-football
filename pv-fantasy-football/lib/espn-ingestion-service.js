@@ -37,7 +37,7 @@ export async function runEspnGameAutomation(gameId,{now=new Date(),espnEventId='
     const snapshot=await fetchSummary(eventId);const identity=inspectEspnGame(snapshot.payload,{eventId});
     if(!identity.valid)throw automationError('GAME_IDENTITY_MISMATCH','ESPN game identity failed closed.',{issues:identity.findings});
     if(identity.state==='pre')return{game_id:normalizedGameId,status:'PREGAME',lineups_locked:now.getTime()>=kickoff};
-    const normalized=normalizeEspnPvStats(snapshot.payload,{players:records(playerRows),aliases:aliasesFrom(nameRows),gameId:normalizedGameId,week:game.Week,sourceUrl:snapshot.sourceUrl,importedAt:snapshot.fetchedAt});
+    const normalized=normalizeEspnPvStats(snapshot.payload,{players:records(playerRows),aliases:aliasesFrom(nameRows),gameId:normalizedGameId,week:game.Week,sourceUrl:snapshot.sourceUrl,importedAt:snapshot.fetchedAt,final:identity.completed});
     if(!normalized.valid)throw automationError('IDENTITY_REVIEW_REQUIRED','ESPN player identity requires review before any write.',{issues:normalized.findings});
 
     const existing=records(statsRows);const byPlayer=new Map(existing.filter(row=>row['Game ID']===normalizedGameId).map(row=>[row['Player ID'],row.__row]));

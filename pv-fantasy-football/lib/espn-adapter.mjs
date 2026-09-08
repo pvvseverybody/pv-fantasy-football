@@ -55,7 +55,7 @@ export function inspectEspnGame(payload,{eventId,homeTeamId=PV_TEAM_ID,awayTeamI
   return{valid:findings.length===0,findings,state:competition?.status?.type?.state||'unknown',completed:Boolean(competition?.status?.type?.completed),date:competition?.date||null};
 }
 
-export function normalizeEspnPvStats(payload,{players,aliases=new Map(),gameId,week,sourceUrl,importedAt=new Date().toISOString()}={}){
+export function normalizeEspnPvStats(payload,{players,aliases=new Map(),gameId,week,sourceUrl,importedAt=new Date().toISOString(),final=false}={}){
   const active=(players||[]).filter(player=>String(player.Active||'YES').toUpperCase()==='YES'&&player['Player ID']);
   const stats=new Map(active.map(player=>[player['Player ID'],emptyStats(player)]));
   const pv=payload?.boxscore?.players?.find(item=>String(item.team?.id)===PV_TEAM_ID);
@@ -75,7 +75,7 @@ export function normalizeEspnPvStats(payload,{players,aliases=new Map(),gameId,w
     row.receivingYards,row.receivingTouchdowns,row.passingInterceptions,row.fumblesLost,row.tackles,
     row.tacklesForLoss,row.tackleForLossYards,row.sacks,row.sackYards,row.quarterbackHurries,
     row.passBreakups,row.defensiveInterceptions,row.interceptionReturnYards,row.forcedFumbles,
-    row.fumbleRecoveries,row.defensiveReturnTouchdowns,sourceUrl,importedAt,'NO',
+    row.fumbleRecoveries,row.defensiveReturnTouchdowns,sourceUrl,importedAt,final?'YES':'NO',
   ]);
   return{valid:true,findings,rows};
 }
