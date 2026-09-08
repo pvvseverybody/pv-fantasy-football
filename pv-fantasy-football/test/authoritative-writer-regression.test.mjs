@@ -28,3 +28,12 @@ test('Google Sheets batch updates use the colon action endpoint',async()=>{
   assert.match(source,/sheetsRequest\(':batchUpdate'/);
   assert.doesNotMatch(source,/sheetsRequest\('batchUpdate'/);
 });
+
+test('accepted scoring-version picks remain valid after the game locks',async()=>{
+  const source=await readFile(
+    new URL('../lib/authoritative-lineups.js',import.meta.url),
+    'utf8'
+  );
+
+  assert.match(source,/AND\(N\$\{row\}="YES",O\$\{row\}="ACCEPTED"\)/);
+});

@@ -1,4 +1,5 @@
 import {calculatePlayerScore, SCORING_RULES} from './scoring-engine.mjs';
+import {isAcceptedScoringPickRow} from './scoring-pick.mjs';
 import {
   batchUpdateSpreadsheet,
   getSpreadsheetMetadata,
@@ -140,7 +141,7 @@ function scoreRows(gameId, rows) {
 function assertAcceptedPlayersHaveStats(gameId, picksRows, scoreByPlayer) {
   const missing = new Set();
   picksRows.slice(1).forEach(row => {
-    const isScoringPick = row[1] === gameId && row[9] === 'YES' && row[13] === 'YES' && row[14] === 'ACCEPTED';
+    const isScoringPick = isAcceptedScoringPickRow(row, gameId);
     if (isScoringPick && !scoreByPlayer.has(String(row[5] || ''))) missing.add(String(row[5] || ''));
   });
   if (missing.size) {
@@ -201,7 +202,7 @@ async function verifyPropagation(gameId, scoreByPlayer) {
 
   const gamePicks = picks.slice(1).filter(row => row[1] === gameId);
   for (const pick of gamePicks) {
-    const shouldScore = pick[9] === 'YES' && pick[13] === 'YES' && pick[14] === 'ACCEPTED';
+    const shouldScore = isAcceptedScoringPickRow(pick);
     const expected = shouldScore ? scoreByPlayer.get(pick[5])?.total : 0;
     if (expected === undefined || !closeEnough(pick[10], expected)) {
       throw scoringError('PICK_SCORE_VERIFY_FAILED', 'A pick did not receive the expected scoring-version player total.', {pickId:pick[0]});
@@ -209,7 +210,7 @@ async function verifyPropagation(gameId, scoreByPlayer) {
   }
 
   const scoringBySubmission = new Map();
-  for (const pick of gamePicks.filter(row => row[9] === 'YES' && row[13] === 'YES' && row[14] === 'ACCEPTED')) {
+  for (const pick of gamePicks.filter(row => isAcceptedScoringPickRow(row))) {
     const current = scoringBySubmission.get(pick[11]) || {total:0, slots:new Set(), players:new Set(), count:0};
     current.total += Number(pick[10]); current.slots.add(pick[4]); current.players.add(pick[5]); current.count += 1;
     scoringBySubmission.set(pick[11], current);

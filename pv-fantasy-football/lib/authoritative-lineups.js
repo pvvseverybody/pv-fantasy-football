@@ -201,7 +201,7 @@ function pickFormulaRow(row, {gameId, week, participantId, slotId, playerId, sub
     `=IF(F${row}="","",IFERROR(VLOOKUP(F${row},Players!$A$4:$B$1000,2,FALSE),""))`,
     submittedSerial,
     `=IF(OR(B${row}="",H${row}=""),"NO",IF(H${row}>=IFERROR(VLOOKUP(B${row},Games!$B$4:$C$1000,2,FALSE),9^9),"YES","NO"))`,
-    `=IF(OR(B${row}="",D${row}="",E${row}="",F${row}="",L${row}=""),"NO",IF(AND(I${row}="NO",IFERROR(VLOOKUP(B${row},Games!$B$4:$J$1000,9,FALSE),"CLOSED")="OPEN",IFERROR(VLOOKUP(F${row},Players!$A$4:$E$1000,5,FALSE),"NO")="YES",IFERROR(VLOOKUP(D${row},Participants!$A$4:$D$1000,4,FALSE),"NO")="YES",COUNTIFS($L$4:$L$1000,L${row},$F$4:$F$1000,F${row})=1,COUNTIFS($L$4:$L$1000,L${row},$E$4:$E$1000,E${row})=1,IFERROR(REGEXMATCH(","&VLOOKUP(E${row},Categories!$A$4:$D$20,4,FALSE)&",",","&VLOOKUP(F${row},Players!$A$4:$C$1000,3,FALSE)&","),FALSE)),"YES","NO"))`,
+    `=IF(AND(N${row}="YES",O${row}="ACCEPTED"),"YES","NO")`,
     `=IF(OR(J${row}<>"YES",N${row}<>"YES"),0,IFERROR(SUMIFS(PlayerScores!$V$4:$V$1000,PlayerScores!$A$4:$A$1000,B${row},PlayerScores!$C$4:$C$1000,F${row}),0))`,
     submissionId, version, 'YES', 'ACCEPTED',
   ];
