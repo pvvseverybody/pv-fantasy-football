@@ -51,7 +51,7 @@ export function inspectEspnGame(payload,{eventId,homeTeamId=PV_TEAM_ID,awayTeamI
   const findings=[];
   if(!competition)findings.push(issue('MISSING_COMPETITION','ESPN summary is missing the competition.'));
   if(eventId&&String(payload?.header?.id)!==String(eventId))findings.push(issue('EVENT_ID_MISMATCH','ESPN event ID does not match FeedControl.',{actual:payload?.header?.id,expected:eventId}));
-  if(!ids.has(String(homeTeamId))||!ids.has(String(awayTeamId)))findings.push(issue('TEAM_IDENTITY_MISMATCH','ESPN teams do not match Prairie View and Texas Southern.'));
+  if(!ids.has(String(homeTeamId))||!ids.has(String(awayTeamId)))findings.push(issue('TEAM_IDENTITY_MISMATCH','ESPN teams do not match the configured Prairie View game.'));
   return{valid:findings.length===0,findings,state:competition?.status?.type?.state||'unknown',completed:Boolean(competition?.status?.type?.completed),date:competition?.date||null};
 }
 

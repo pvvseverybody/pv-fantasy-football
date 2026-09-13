@@ -13,7 +13,7 @@ function automationError(code,message,details={}){const error=new Error(message)
 function sheetId(metadata,title){const sheet=(metadata.sheets||[]).find(item=>item.properties.title===title);if(!sheet)throw automationError('SCHEMA_MISMATCH',`Missing sheet ${title}.`);return sheet.properties.sheetId;}
 function aliasesFrom(rows){const map=new Map();for(const row of records(rows)){const source=first(row,['Provider Name','Source Name','Alias','Raw Name']);const target=first(row,['Player Name','Roster Name','Canonical Name','PV Player Name']);if(source&&target)map.set(normalizedName(source),target);}return map;}
 
-export async function runEspnGameAutomation(gameId,{now=new Date(),espnEventId='',fetchSummary=fetchEspnSummary,score=scoreGame}={}){
+export async function runEspnGameAutomation(gameId,{now=new Date(),espnEventId='',opponentTeamId='',fetchSummary=fetchEspnSummary,score=scoreGame}={}){
   const normalizedGameId=String(gameId||'').trim();if(!normalizedGameId)throw automationError('INVALID_GAME','game_id is required.');
     const [gameRows,feedRows,playerRows,nameRows,statsRows,metadata]=await Promise.all([
       readSheetRange("'Games'!A3:L100",{valueRenderOption:'FORMATTED_VALUE'}),
@@ -34,7 +34,7 @@ export async function runEspnGameAutomation(gameId,{now=new Date(),espnEventId='
     if(now.getTime()>=kickoff&&String(game['Pick Status']).toUpperCase()==='OPEN')requests.push(updateCell(sheetId(metadata,'Games'),game.__row,9,'LOCKED'));
     if(requests.length)await batchUpdateSpreadsheet(requests);
 
-    const snapshot=await fetchSummary(eventId);const identity=inspectEspnGame(snapshot.payload,{eventId});
+    const snapshot=await fetchSummary(eventId);const identity=inspectEspnGame(snapshot.payload,{eventId,awayTeamId:opponentTeamId||undefined});
     if(!identity.valid)throw automationError('GAME_IDENTITY_MISMATCH','ESPN game identity failed closed.',{issues:identity.findings});
     if(identity.state==='pre')return{game_id:normalizedGameId,status:'PREGAME',lineups_locked:now.getTime()>=kickoff};
     const normalized=normalizeEspnPvStats(snapshot.payload,{players:records(playerRows),aliases:aliasesFrom(nameRows),gameId:normalizedGameId,week:game.Week,sourceUrl:snapshot.sourceUrl,importedAt:snapshot.fetchedAt,final:identity.completed});
