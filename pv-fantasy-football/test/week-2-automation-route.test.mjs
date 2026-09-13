@@ -10,9 +10,10 @@ test('Week 2 automation route is bearer protected and fixed to the authoritative
   assert.match(source,/official_publication:false|runEspnGameAutomation/);
 });
 
-test('Week 2 scheduled workflow uses the protected production endpoint on Saturdays',async()=>{
+test('Week 2 scheduled workflow covers Saturday and the Sunday UTC post-kickoff window',async()=>{
   const source=await readFile(new URL('../../.github/workflows/week-2-automation.yml',import.meta.url),'utf8');
   assert.match(source,/cron: '\*\/5 \* \* \* 6'/);
+  assert.match(source,/cron: '\*\/5 0-12 \* \* 0'/);
   assert.match(source,/id-token: write/);
   assert.match(source,/ACTIONS_ID_TOKEN_REQUEST_URL/);
   assert.match(source,/Authorization: Bearer/);
