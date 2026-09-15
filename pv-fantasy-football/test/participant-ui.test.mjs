@@ -41,6 +41,8 @@ test('official assets resolve by authoritative opponent without altering lineup 
   assert.equal(officialAsset('opponent','Tarleton State').approved,true);
   assert.equal(officialAsset('opponent','Texas Southern').src,'/assets/official/opponents/texas-southern.png');
   assert.equal(officialAsset('opponent','Texas Southern').approved,true);
+  assert.equal(officialAsset('opponent','Stephen F. Austin').src,'/assets/official/opponents/stephen-f-austin.png');
+  assert.equal(officialAsset('opponent','Stephen F. Austin').approved,true);
   assert.equal(officialAsset('opponent','Unknown Opponent').src,'');
   assert.equal(officialAsset('pvamu').src,'/assets/official/prairie-view-am-logo.png');
   assert.equal(officialAsset('pvamu').approved,true);
