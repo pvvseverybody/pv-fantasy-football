@@ -28,6 +28,7 @@ export const APPROVED_OFFICIAL_ASSET_KEYS = Object.freeze([
   'opponent:Texas Southern',
   'opponent:Baylor',
   'opponent:Stephen F. Austin',
+  'opponent:Grambling State',
 ]);
 
 const OPPONENT_ALIASES = Object.freeze({
