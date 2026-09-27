@@ -27,5 +27,6 @@ export async function verifyGithubActionsToken(token,{audience,workflow,fetchImp
 export const verifyWeek1GithubToken=(token,options={})=>verifyGithubActionsToken(token,{...options,audience:'pv-fantasy-week-1',workflow:'week-1-automation.yml'});
 export const verifyWeek2GithubToken=(token,options={})=>verifyGithubActionsToken(token,{...options,audience:'pv-fantasy-week-2',workflow:'week-2-automation.yml'});
 export const verifyWeek3GithubToken=(token,options={})=>verifyGithubActionsToken(token,{...options,audience:'pv-fantasy-week-3',workflow:'week-3-automation.yml'});
+export const verifyWeek4GithubToken=(token,options={})=>verifyGithubActionsToken(token,{...options,audience:'pv-fantasy-week-4',workflow:'week-4-automation.yml'});
 
 export {ISSUER};
