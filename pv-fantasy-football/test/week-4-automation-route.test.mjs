@@ -19,4 +19,5 @@ test('Week 4 scheduled workflow covers Saturday and the Sunday UTC post-kickoff 
   assert.match(source,/audience=pv-fantasy-week-4/);
   assert.match(source,/Authorization: Bearer/);
   assert.match(source,/api\/automation\/week-4/);
+  assert.match(source,/push:/);
 });

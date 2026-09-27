@@ -18,7 +18,7 @@ export async function verifyGithubActionsToken(token,{audience,workflow,fetchImp
   if(header.alg!=='RS256'||!header.kid)return false;
   const workflowRef=`${REPOSITORY}/.github/workflows/${workflow}@refs/heads/main`;
   if(claims.iss!==ISSUER||claims.aud!==audience||claims.repository!==REPOSITORY||claims.workflow_ref!==workflowRef)return false;
-  if(claims.ref!=='refs/heads/main'||!['schedule','workflow_dispatch'].includes(claims.event_name))return false;
+  if(claims.ref!=='refs/heads/main'||!['schedule','workflow_dispatch','push'].includes(claims.event_name))return false;
   if(!Number.isFinite(Number(claims.exp))||Number(claims.exp)<now||Number(claims.iat)>now+60)return false;
   const jwk=(await keys(fetchImpl)).find(item=>item.kid===header.kid);if(!jwk)return false;
   try{return verify('RSA-SHA256',Buffer.from(`${parts[0]}.${parts[1]}`),createPublicKey({key:jwk,format:'jwk'}),Buffer.from(parts[2],'base64url'));}catch{return false;}
