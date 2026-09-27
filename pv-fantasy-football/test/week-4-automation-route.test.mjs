@@ -11,13 +11,12 @@ test('Week 4 automation route is bearer protected and fixed to the authoritative
   assert.match(source,/runEspnGameAutomation/);
 });
 
-test('Week 4 scheduled workflow covers Saturday and the Sunday UTC post-kickoff window',async()=>{
+test('Week 4 manual workflow retains protected OIDC execution after final import',async()=>{
   const source=await readFile(new URL('../../.github/workflows/week-4-automation.yml',import.meta.url),'utf8');
-  assert.match(source,/cron: '\*\/5 \* \* \* 6'/);
-  assert.match(source,/cron: '\*\/5 0-12 \* \* 0'/);
+  assert.match(source,/workflow_dispatch:/);
   assert.match(source,/id-token: write/);
   assert.match(source,/audience=pv-fantasy-week-4/);
   assert.match(source,/Authorization: Bearer/);
   assert.match(source,/api\/automation\/week-4/);
-  assert.match(source,/push:/);
+  assert.doesNotMatch(source,/schedule:/);
 });
