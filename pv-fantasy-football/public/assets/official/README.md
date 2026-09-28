@@ -25,4 +25,6 @@ PNG is the approved interchange format. Keep each original aspect ratio and tran
 
 The Grambling State mark was sourced from the current Grambling State Athletics site header and converted from its official SVG to PNG without visual alteration.
 
+The Mississippi Valley State mark was sourced from the current Mississippi Valley State Athletics site header and converted from its official transparent WebP to PNG without visual alteration.
+
 After Lionel approves a supplied file, add its exact key to `APPROVED_OFFICIAL_ASSET_KEYS` in `lib/official-assets.mjs`. Merely placing a file at an expected path does not approve it.
