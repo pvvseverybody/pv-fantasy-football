@@ -13,7 +13,7 @@ function automationError(code,message,details={}){const error=new Error(message)
 function sheetId(metadata,title){const sheet=(metadata.sheets||[]).find(item=>item.properties.title===title);if(!sheet)throw automationError('SCHEMA_MISMATCH',`Missing sheet ${title}.`);return sheet.properties.sheetId;}
 function aliasesFrom(rows){const map=new Map();for(const row of records(rows)){const source=first(row,['Provider Name','Source Name','Alias','Raw Name']);const target=first(row,['Player Name','Roster Name','Canonical Name','PV Player Name']);if(source&&target)map.set(normalizedName(source),target);}return map;}
 
-export async function runEspnGameAutomation(gameId,{now=new Date(),espnEventId='',opponentTeamId='',fetchSummary=fetchEspnSummary,score=scoreGame}={}){
+export async function runEspnGameAutomation(gameId,{now=new Date(),espnEventId='',opponentTeamId='',allowFinalReconciliation=false,fetchSummary=fetchEspnSummary,score=scoreGame}={}){
   const normalizedGameId=String(gameId||'').trim();if(!normalizedGameId)throw automationError('INVALID_GAME','game_id is required.');
     const [gameRows,feedRows,playerRows,nameRows,statsRows,metadata]=await Promise.all([
       readSheetRange("'Games'!A3:L100",{valueRenderOption:'FORMATTED_VALUE'}),
@@ -28,7 +28,7 @@ export async function runEspnGameAutomation(gameId,{now=new Date(),espnEventId='
     if(!/^\d+$/.test(eventId))throw automationError('ESPN_EVENT_UNCONFIGURED','FeedControl Event ID must be the ESPN numeric event ID.');
     const kickoff=centralKickoffEpoch(game['Kickoff (CT)']);if(!kickoff)throw automationError('INVALID_KICKOFF','The authoritative kickoff cannot be parsed.');
     if(now.getTime()<kickoff-2*60*60*1000)return{game_id:normalizedGameId,status:'TOO_EARLY',next_action:'WAIT_FOR_LIVE_WINDOW'};
-    if(now.getTime()>kickoff+12*60*60*1000)return{game_id:normalizedGameId,status:'WINDOW_CLOSED',next_action:'OFFICIAL_RECONCILIATION'};
+    if(now.getTime()>kickoff+12*60*60*1000&&!allowFinalReconciliation)return{game_id:normalizedGameId,status:'WINDOW_CLOSED',next_action:'OFFICIAL_RECONCILIATION'};
 
     const requests=[];
     if(now.getTime()>=kickoff&&String(game['Pick Status']).toUpperCase()==='OPEN')requests.push(updateCell(sheetId(metadata,'Games'),game.__row,9,'LOCKED'));
@@ -37,6 +37,7 @@ export async function runEspnGameAutomation(gameId,{now=new Date(),espnEventId='
     const snapshot=await fetchSummary(eventId);const identity=inspectEspnGame(snapshot.payload,{eventId,awayTeamId:opponentTeamId||undefined});
     if(!identity.valid)throw automationError('GAME_IDENTITY_MISMATCH','ESPN game identity failed closed.',{issues:identity.findings});
     if(identity.state==='pre')return{game_id:normalizedGameId,status:'PREGAME',lineups_locked:now.getTime()>=kickoff};
+    if(allowFinalReconciliation&&!identity.completed)throw automationError('FINAL_STATS_UNAVAILABLE','The official provider has not marked the game final.');
     const normalized=normalizeEspnPvStats(snapshot.payload,{players:records(playerRows),aliases:aliasesFrom(nameRows),gameId:normalizedGameId,week:game.Week,sourceUrl:snapshot.sourceUrl,importedAt:snapshot.fetchedAt,final:identity.completed});
     if(!normalized.valid)throw automationError('IDENTITY_REVIEW_REQUIRED','ESPN player identity requires review before any write.',{issues:normalized.findings});
 
