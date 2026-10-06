@@ -14,6 +14,7 @@ test('Week 5 route uses the guarded final ESPN reconciliation',async()=>{
 test('Week 5 workflow requests the matching OIDC audience',async()=>{
   const source=await readFile(new URL('../../.github/workflows/week-5-automation.yml',import.meta.url),'utf8');
   assert.match(source,/workflow_dispatch/);
+  assert.match(source,/week-5-run-now\.trigger/);
   assert.match(source,/audience=pv-fantasy-week-5/);
   assert.match(source,/api\/automation\/week-5/);
 });
