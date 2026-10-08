@@ -47,6 +47,8 @@ test('official assets resolve by authoritative opponent without altering lineup 
   assert.equal(officialAsset('opponent','Grambling State').approved,true);
   assert.equal(officialAsset('opponent','Mississippi Valley State').src,'/assets/official/opponents/mississippi-valley-state.png');
   assert.equal(officialAsset('opponent','Mississippi Valley State').approved,true);
+  assert.match(officialAsset('opponent','Southern').src,/gojagsports\.com\/images\/responsive_2022\/svgs\/logo_main\.svg$/);
+  assert.equal(officialAsset('opponent','Southern').approved,true);
   assert.equal(officialAsset('opponent','Unknown Opponent').src,'');
   assert.equal(officialAsset('pvamu').src,'/assets/official/prairie-view-am-logo.png');
   assert.equal(officialAsset('pvamu').approved,true);
