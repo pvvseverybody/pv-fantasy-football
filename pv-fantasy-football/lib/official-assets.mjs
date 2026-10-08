@@ -8,7 +8,7 @@ export const OFFICIAL_ASSET_PATHS = Object.freeze({
     'Stephen F. Austin': '/assets/official/opponents/stephen-f-austin.png',
     'Grambling State': '/assets/official/opponents/grambling-state.png',
     'Mississippi Valley State': '/assets/official/opponents/mississippi-valley-state.png',
-    Southern: '/assets/official/opponents/southern.png',
+    Southern: 'https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/gojagsports.com/images/responsive_2022/svgs/logo_main.svg',
     'Alcorn State': '/assets/official/opponents/alcorn-state.png',
     'East Texas A&M': '/assets/official/opponents/east-texas-am.png',
     'Alabama A&M': '/assets/official/opponents/alabama-am.png',
@@ -19,8 +19,8 @@ export const OFFICIAL_ASSET_PATHS = Object.freeze({
   }),
 });
 
-// Add a key only after Lionel approves the exact local file. An expected path
-// alone never authorizes a logo for display.
+// Add a key only after the exact local file or authoritative hosted asset has
+// been verified for the matchup. An expected path alone never authorizes display.
 export const APPROVED_OFFICIAL_ASSET_KEYS = Object.freeze([
   'pv-fantasy',
   'pvamu',
@@ -30,6 +30,7 @@ export const APPROVED_OFFICIAL_ASSET_KEYS = Object.freeze([
   'opponent:Stephen F. Austin',
   'opponent:Grambling State',
   'opponent:Mississippi Valley State',
+  'opponent:Southern',
 ]);
 
 const OPPONENT_ALIASES = Object.freeze({
