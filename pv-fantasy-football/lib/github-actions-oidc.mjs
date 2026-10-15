@@ -29,5 +29,6 @@ export const verifyWeek2GithubToken=(token,options={})=>verifyGithubActionsToken
 export const verifyWeek3GithubToken=(token,options={})=>verifyGithubActionsToken(token,{...options,audience:'pv-fantasy-week-3',workflow:'week-3-automation.yml'});
 export const verifyWeek4GithubToken=(token,options={})=>verifyGithubActionsToken(token,{...options,audience:'pv-fantasy-week-4',workflow:'week-4-automation.yml'});
 export const verifyWeek5GithubToken=(token,options={})=>verifyGithubActionsToken(token,{...options,audience:'pv-fantasy-week-5',workflow:'week-5-automation.yml',allowedEvents:['workflow_dispatch','push']});
+export const verifyWeek6GithubToken=(token,options={})=>verifyGithubActionsToken(token,{...options,audience:'pv-fantasy-week-6',workflow:'week-6-automation.yml',allowedEvents:['workflow_dispatch','push']});
 
 export {ISSUER};
