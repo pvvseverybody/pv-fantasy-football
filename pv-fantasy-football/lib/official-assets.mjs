@@ -10,7 +10,7 @@ export const OFFICIAL_ASSET_PATHS = Object.freeze({
     'Mississippi Valley State': '/assets/official/opponents/mississippi-valley-state.png',
     Southern: 'https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/gojagsports.com/images/responsive_2022/svgs/logo_main.svg',
     'Alcorn State': 'https://alcornsports.com/images/main_logo.png',
-    'East Texas A&M': '/assets/official/opponents/east-texas-am.png',
+    'East Texas A&M': 'https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/tamuc.sidearmsports.com/images/responsive_2024/logo_main.svg',
     'Alabama A&M': '/assets/official/opponents/alabama-am.png',
     'Arkansas-Pine Bluff': '/assets/official/opponents/arkansas-pine-bluff.png',
     'Alabama State': '/assets/official/opponents/alabama-state.png',
@@ -32,6 +32,7 @@ export const APPROVED_OFFICIAL_ASSET_KEYS = Object.freeze([
   'opponent:Mississippi Valley State',
   'opponent:Southern',
   'opponent:Alcorn State',
+  'opponent:East Texas A&M',
 ]);
 
 const OPPONENT_ALIASES = Object.freeze({
