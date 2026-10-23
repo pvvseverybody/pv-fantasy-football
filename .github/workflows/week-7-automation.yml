@@ -1,0 +1,32 @@
+name: Week 7 Fantasy Automation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/week-7-run-now.trigger
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: pv-fantasy-week-7
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run guarded Week 7 final reconciliation
+        run: |
+          set -euo pipefail
+          token=$(curl --fail-with-body --silent --show-error \
+            --header "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=pv-fantasy-week-7" | jq -r .value)
+          response=$(curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer ${token}" \
+            https://fantasy.pvvseverybody.com/api/automation/week-7)
+          printf '%s\n' "$response"
