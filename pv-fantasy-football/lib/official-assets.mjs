@@ -11,7 +11,7 @@ export const OFFICIAL_ASSET_PATHS = Object.freeze({
     Southern: 'https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/gojagsports.com/images/responsive_2022/svgs/logo_main.svg',
     'Alcorn State': 'https://alcornsports.com/images/main_logo.png',
     'East Texas A&M': 'https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/tamuc.sidearmsports.com/images/responsive_2024/logo_main.svg',
-    'Alabama A&M': '/assets/official/opponents/alabama-am.png',
+    'Alabama A&M': 'https://aamusports.com/images/logos/site/site.png',
     'Arkansas-Pine Bluff': '/assets/official/opponents/arkansas-pine-bluff.png',
     'Alabama State': '/assets/official/opponents/alabama-state.png',
     'SWAC Championship': '/assets/official/opponents/swac-championship.png',
