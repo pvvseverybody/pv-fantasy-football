@@ -180,7 +180,7 @@ function findActiveRow(rows, gameId, participantId) {
 
 async function readAuthoritativeState() {
   const entries = await Promise.all(Object.entries(AUTHORITATIVE_SCHEMAS).map(async ([sheet, headers]) => {
-    const rows = await readSheetRange(`'${sheet}'!A3:${columnName(headers.length - 1)}1000`);
+    const rows = await readSheetRange(`'${sheet}'!A3:${columnName(headers.length - 1)}${sheet === 'Picks' ? 10000 : 1000}`);
     assertSchema(sheet, rows);
     return [sheet, rows];
   }));
@@ -211,15 +211,15 @@ function lineupProjectionRow(row, data) {
   const {lineupId, gameId, week, participantId, displayName, submittedSerial, kickoffSerial, submissionId, version, commissionerNotes} = data;
   return [
     lineupId, gameId, week, participantId, displayName, submittedSerial, kickoffSerial,
-    `=COUNTIF(Picks!$L$4:$L$1000,S${row})`,
-    `=COUNTIFS(Picks!$L$4:$L$1000,S${row},Picks!$J$4:$J$1000,"YES")`,
-    `=IF(S${row}="",0,COUNTUNIQUE(FILTER(Picks!$E$4:$E$1000,Picks!$L$4:$L$1000=S${row})))`,
-    `=IF(S${row}="",0,COUNTUNIQUE(FILTER(Picks!$F$4:$F$1000,Picks!$L$4:$L$1000=S${row})))`,
+    `=COUNTIF(Picks!$L$4:$L$10000,S${row})`,
+    `=COUNTIFS(Picks!$L$4:$L$10000,S${row},Picks!$J$4:$J$10000,"YES")`,
+    `=IF(S${row}="",0,COUNTUNIQUE(FILTER(Picks!$E$4:$E$10000,Picks!$L$4:$L$10000=S${row})))`,
+    `=IF(S${row}="",0,COUNTUNIQUE(FILTER(Picks!$F$4:$F$10000,Picks!$L$4:$L$10000=S${row})))`,
     `=IF(AND(H${row}=8,I${row}=8,J${row}=8,K${row}=8),"YES","NO")`,
     `=IF(AND(F${row}<>"",G${row}<>"",F${row}<G${row}),"YES","NO")`,
     `=IF(AND(L${row}="YES",M${row}="YES",IFERROR(VLOOKUP(D${row},Participants!$A$4:$D$1000,4,FALSE),"NO")="YES"),"YES","NO")`,
     `=IF(N${row}="YES","LOCKED","REJECTED")`,
-    `=IF(N${row}<>"YES",0,SUMIFS(Picks!$K$4:$K$1000,Picks!$L$4:$L$1000,S${row},Picks!$J$4:$J$1000,"YES"))`,
+    `=IF(N${row}<>"YES",0,SUMIFS(Picks!$K$4:$K$10000,Picks!$L$4:$L$10000,S${row},Picks!$J$4:$J$10000,"YES"))`,
     `=IF(N${row}="YES","ACCEPTED — ACTIVE VERSION V"&T${row},IF(M${row}<>"YES","REJECTED — LATE SUBMISSION","REJECTED — LINEUP INCOMPLETE OR INVALID"))`,
     commissionerNotes, submissionId, version, 'YES',
   ];
@@ -228,7 +228,7 @@ function lineupProjectionRow(row, data) {
 async function verifyCommit({submissionId, gameId, participantId}) {
   const [history, picks, lineups, active] = await Promise.all([
     readSheetRange("'SubmissionHistory'!A3:P1000"),
-    readSheetRange("'Picks'!A3:O1000"),
+    readSheetRange("'Picks'!A3:O10000"),
     readSheetRange("'Lineups'!A3:U1000"),
     readSheetRange("'ActiveLineups'!A3:N1000"),
   ]);
@@ -278,9 +278,13 @@ export async function promoteLineupSubmission({submissionId, email, gameId, week
     const lineupProjection = findProjection(state.Lineups, gameId, participant.id);
     const lineupRow = lineupProjection.rowNumber;
     const activeRow = findActiveRow(state.ActiveLineups, gameId, participant.id);
-    if (firstPickRow + LINEUP_SLOTS.length - 1 > 1000) throw new Error('Picks sheet has insufficient capacity.');
+    if (firstPickRow + LINEUP_SLOTS.length - 1 > 10000) throw new Error('Picks sheet has insufficient capacity.');
 
     const requests = [];
+    const pickGrid = metadata.sheets.find(sheet => sheet.properties.title === 'Picks').properties.gridProperties;
+    if (pickGrid.rowCount < 10000) {
+      requests.push({appendDimension:{sheetId:ids.Picks,dimension:'ROWS',length:10000-pickGrid.rowCount}});
+    }
     if (priorActive) {
       requests.push(updateCell(ids.SubmissionHistory, priorActive.rowNumber, 5, 'SUPERSEDED'));
       requests.push(updateCell(ids.SubmissionHistory, priorActive.rowNumber, 7, submissionId));
@@ -313,7 +317,7 @@ export async function promoteLineupSubmission({submissionId, email, gameId, week
     requests.push(updateRow(ids.ActiveLineups, activeRow, [
       gameId, week, participant.id, participant.displayName, submissionId, version,
       submittedSerial, kickoffSerial, 'YES', 'YES', 8,
-      `=SUMIFS(Picks!$K$4:$K$1000,Picks!$L$4:$L$1000,E${activeRow},Picks!$J$4:$J$1000,"YES")`,
+      `=SUMIFS(Picks!$K$4:$K$10000,Picks!$L$4:$L$10000,E${activeRow},Picks!$J$4:$J$10000,"YES")`,
       'LOCKED FOR SCORING', `Active version V${version}; source ledger ${submissionId}.`,
     ]));
 

@@ -175,7 +175,7 @@ function assertWorkbookRules(rows) {
 async function verifyPropagation(gameId, scoreByPlayer) {
   const [playerRows, picks, lineups, active, weekly] = await Promise.all([
     readSheetRange("'PlayerScores'!A3:V1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
-    readSheetRange("'Picks'!A3:O1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
+    readSheetRange("'Picks'!A3:O10000", {valueRenderOption:'UNFORMATTED_VALUE'}),
     readSheetRange("'Lineups'!A3:U1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
     readSheetRange("'ActiveLineups'!A3:N1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
     readSheetRange("'WeeklyScores'!A3:H1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
@@ -254,7 +254,7 @@ export async function scoreGame(gameId) {
     const [gameStats, playerScores, picks, settings, metadata] = await Promise.all([
       readSheetRange("'GameStats'!A3:Z1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
       readSheetRange("'PlayerScores'!A3:V1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
-      readSheetRange("'Picks'!A3:O1000", {valueRenderOption:'UNFORMATTED_VALUE'}),
+      readSheetRange("'Picks'!A3:O10000", {valueRenderOption:'UNFORMATTED_VALUE'}),
       readSheetRange("'Settings'!C13:C29", {valueRenderOption:'UNFORMATTED_VALUE'}),
       getSpreadsheetMetadata(),
     ]);
